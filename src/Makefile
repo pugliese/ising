@@ -6,7 +6,8 @@ LD = $(CC)
 SOURCE_C = $(wildcard *.c)
 OBJECTS_C = $(patsubst %.c, %_c.o, $(SOURCE_C))
 
-EXECUTABLE = ising.e
+CFLAGS = -std=gnu99
+EXECUTABLE = ../bin/ising.e
 
 default: help
 
@@ -26,7 +27,7 @@ executable: $(EXECUTABLE)
 all: objects executable
 
 %_c.o: %.c
-	$(CC) -c $^ -o $@
+	$(CC) $(CFLAGS) -c $^ -o $@
 
 %.e: $(OBJECTS_C)
 	$(LD) $^ -o $@
