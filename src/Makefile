@@ -27,10 +27,10 @@ executable: $(EXECUTABLE)
 all: objects executable
 
 ../bin/%_c.o: %.c
-	$(CC) $(CFLAGS) -c $^ -o ../bin/$@
+	$(CC) $(CFLAGS) -c $^ -o ../bin/$@ -lm
 
 %.e: $(OBJECTS_C)
-	$(LD) $^ -o $@
+	$(LD) $^ -o $@ -lm
 
 clean:
 	rm -rfv $(OBJECTS_C) $(EXECUTABLE)
