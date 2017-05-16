@@ -4,7 +4,7 @@
 #include <time.h>
 #include <math.h>
 
-int fill_lattice(int *lattice, int n, float p) { 
+int fill_lattice(int *lattice, int n, float p) {
   int i,res=0, r;
   for (i=0;i<n*n;i++){
     r= rand();
