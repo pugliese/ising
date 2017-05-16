@@ -14,9 +14,11 @@ int main(int argc, char **argv) {
   int niter = 2000;
   srand(time(NULL));
   fill_lattice(lattice, n, prob);
+  
   for (int i = 0; i < niter; i++) {
     metropolis(lattice, n, T);
   }
   print_lattice(lattice, n);
+  free (lattice);
   return 0;
 }
