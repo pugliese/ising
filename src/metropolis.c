@@ -4,7 +4,7 @@
 #include <time.h>
 #include <math.h>
 
-int metropolis(int *lattice, int n, float T, float *EM) {
+int metropolis(int *lattice, int n, float B, float T, float *EM) {
   int idx = pick_site(lattice, n);
   flip(lattice, n, T, idx, EM);
   return 0;
@@ -22,13 +22,17 @@ int pick_site(int *lattice, int n) {  // (float) (rand ()   /RAND_MAX) n*n
   return res;
 }
 
-int flip(int *lattice, int n, float T, int idx, float *EM) {
-  int s = 0;
-  int i, j, res;
-  i = idx/n;    // Fila
-  j = idx%n;  // Columna
-  s=lattice[((i+1)%n)*n+j]+lattice[((i-1+n)%n)*n+j]+lattice[i*n+((j+1)%n)]+lattice[i*n+((j-1+n)%n)];
-  float deltaE = 2*lattice[idx]*s;
+int suma_vecinos(int* lattice, int idx){  // Sumo los spins de los vecinos
+  int i = idx/n;    // Fila
+  int j = idx%n;    // Columna
+  int res=lattice[((i+1)%n)*n+j]+lattice[((i-1+n)%n)*n+j]+lattice[i*n+((j+1)%n)]+lattice[i*n+((j-1+n)%n)];
+  return res;
+}
+
+int flip(int *lattice, int n, float B, float T, int idx, float *EM) {
+  int res;
+  int s = suma_vecinos(lattice,idx);
+  float deltaE = 2*(s+B)*lattice[idx];
   if (deltaE<=0){
     res=1;
     lattice[idx]=-lattice[idx];
