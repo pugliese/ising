@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
   int niter = 2000;
   srand(time(NULL));
   fill_lattice(lattice, n, prob);
-  
+  energia_0(lattice, n,B);
   for (int i = 0; i < niter; i++) {
     metropolis(lattice, n, T);
   }

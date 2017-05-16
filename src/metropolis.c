@@ -49,3 +49,12 @@ int flip(int *lattice, int n, float B, float T, int idx, float *EM) {
   }
   return res;
 }
+
+int energia_0(int *lattice, int n, int B){
+  int res=0; // res va a  ser la energia
+  for (i=0;i<n*n;i++) {
+    res=res-lattice[i]*sum_vecinos(lattice,idx);
+  }
+  res=res-B*fill_lattice(lattice,n,p);
+  return res;
+}
