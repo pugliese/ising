@@ -11,12 +11,13 @@ int main(int argc, char **argv) {
   int *lattice = malloc(n * n * sizeof(int));
   float prob = 0.5;
   float T = 2.0;
+  float EM[2];
   int niter = 2000;
   srand(time(NULL));
-  fill_lattice(lattice, n, prob);
-  energia_0(lattice, n,B);
+  EM[1]=fill_lattice(lattice, n, prob);
+  EM[0]=energia_0(lattice, n,B);
   for (int i = 0; i < niter; i++) {
-    metropolis(lattice, n, T);
+    metropolis(lattice, n, T, EM);
   }
   print_lattice(lattice, n);
   free (lattice);
