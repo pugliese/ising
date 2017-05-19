@@ -42,3 +42,5 @@ int test_pick(int *lattice, int n, int niter){
 fclose(fp);
 free (A);
 }
+
+int test_
