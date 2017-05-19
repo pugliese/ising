@@ -6,24 +6,33 @@
 #include "metropolis.h"
 #include "lattice.h"
 int test_pick(int *lattice,int n, int niter);
+int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int niter, int nsaltos, int ks);
 
 int main(int argc, char **argv) {
   int n = 32;
   int *lattice = malloc(n * n * sizeof(int));
   float prob = 0.5;
-  float T = 2.0;
-  float EM[2];
+  float T = 4.0;
+  float J=1;
+  float E;
+  int M;
   int niter = 20000;
+  float B =10;
   srand(time(NULL));
-  /*
-  EM[1]=fill_lattice(lattice, n, prob);
-  EM[0]=energia_0(lattice, n,B);
-  for (int i = 0; i < niter; i++) {
-    metropolis(lattice, n, T, EM);
+  float LUT[10];
+  for(int i=0;i<5;i++){ // Los posibles valores de los spins de alrededor son 2*i-4 para i=0,..,4 (-4,-2,0,2,4)
+    LUT[i] = exp(-(2*(J*(2*i-4)+B))/T);  // Spin positivo
+    LUT[i+5] = exp((2*(J*(2*i-4)+B))/T);  // Spin negativo
   }
-  print_lattice(lattice, n);
-  */
-  test_pick(lattice,n,niter);
+  E=fill_lattice(lattice, n, prob);
+  M=energia_0(lattice, n,B);/*
+  for (int i = 0; i < niter; i++) {
+    metropolis(lattice, n, B, LUT, EM);
+  }
+  print_lattice(lattice, n);*/
+
+  //test_pick(lattice,n,niter);
+  test_correlacion(lattice, n, B, J, LUT, &E, &M, 100, n*n, 1);
   free (lattice);
   return 0;
 }
@@ -43,4 +52,36 @@ fclose(fp);
 free (A);
 }
 
-int test_
+int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int niter, int nsaltos, int ks){
+  int secs = (unsigned) time(NULL);
+  float* CE = (float *) malloc(ks*sizeof(float));
+  float* CM = (float *) malloc(ks*sizeof(float));
+  float* corrs;
+  for(int k=0;k<ks;k++){
+    corrs = correlacion(lattice, n, B, J, LUT, p_e, p_m, k+1, niter, nsaltos);
+    CE[k] = corrs[0];
+    CM[k] = corrs[1];
+    free(corrs);
+  }
+  printf("Calcule todo\n");
+  FILE* fp = fopen("test_correlacion.txt","a");
+  fprintf(fp, "Test de la funcion de correlacion promediando %d correlaciones, calculadas con %d saltos cada una\nE: ", niter, nsaltos);
+  for(int k=0;k<ks-1;k++){
+    fprintf(fp, "%f, ", CE[k]);
+  }
+  fprintf(fp, "%f\n", CE[ks-1]);
+  fprintf(fp, "M:");
+  for(int k=0;k<ks-1;k++){
+    fprintf(fp, "%f, ", CM[k]);
+  }
+  fprintf(fp, "%f\n", CM[ks-1]);
+  secs = (unsigned) time(NULL)-secs;
+  int mins = secs/60;
+  int horas = mins/60;
+  fprintf(fp, "La simulacion tomó %d hs, %d min, %d segs\n\n", horas, mins, secs-60*mins-3600*horas);
+  printf("Escribi todo\n");
+  fclose(fp);
+  free(CE);
+  free(CM);
+  return 0;
+}
