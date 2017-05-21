@@ -38,11 +38,11 @@ int flip(int *lattice, int n, float B, float J, float* LUT, int idx, float *p_e,
 // Si el spin es negativo, lo busca en los ultimos 5. Si es positivo, lo busca en los primeros 5 (no suma 5)
 // Dentro del subarray, accede a la posicion i=S/2+2 que corresponde a vecinos sumando 2*i-4
 // Es más fácil entender esto viendo la definición de la LUT en ising.c
-  if(rand()<proba){
+  if(rand()<proba*RAND_MAX){
     res=1;
     lattice[idx]=-lattice[idx];
-    *p_e=*p_e-2*(J*s+B)*lattice[idx];
-    *p_m=*p_m+2*lattice[idx];
+    *p_e=(*p_e)-2*(J*s+B)*lattice[idx];
+    *p_m=(*p_m)+2*lattice[idx];
   }
   return res;
 
@@ -65,10 +65,10 @@ int flip(int *lattice, int n, float B, float J, float* LUT, int idx, float *p_e,
   return res;*/
 }
 
-float energia_0(int *lattice, int n, float B){
+float energia_0(int *lattice, int n, float J, float B){
   float res=0; // res va a  ser la energia
   for (int i=0;i<n*n;i++) {
-    res=res-lattice[i]*(suma_vecinos(lattice,n,i)/2+B);
+    res=res-lattice[i]*(J*suma_vecinos(lattice,n,i)/2+B);
   }
   return res;
 }
@@ -93,11 +93,13 @@ float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e
       Mo = *p_m;
       Ej = Ej+*p_e/nsaltos;
       Mj = Ej+*p_m/nsaltos;
-      Ej2 = Ej2+*p_e**p_e/nsaltos;
-      Mj2 = Mj2+*p_m**p_m/nsaltos;
+      Ej2 = Ej2+(*p_e)*(*p_e)/nsaltos;
+      Mj2 = Mj2+(*p_m)*(*p_m)/nsaltos;
+      //printf("Asigne los no XjXjk\n");
       for(m=0;m<k;m++){
         metropolis(lattice,n,B,J,LUT,p_e,p_m); // Avanzo k pasos
       }
+      //printf("Avance los %d pasos\n", k);
       EjEjk = EjEjk+Eo*(*p_e)/nsaltos;
       MjMjk = MjMjk+Mo*(*p_m)/nsaltos;
     }
@@ -105,6 +107,6 @@ float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e
     corrs[1] = corrs[1]+(MjMjk-Mj*Mj)/(niter*(Mj2-Mj*Mj));
 //    printf("Puedo calcular una correlacion!!\n");
   }
-  printf("Puedo calcular un promedio de correlaciones!\n");
+  //printf("Puedo calcular un promedio de correlaciones!\n");
   return corrs;
 }
