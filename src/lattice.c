@@ -10,6 +10,7 @@ int fill_lattice(int *lattice, int n, float p) {
   for (i=0;i<n*n;i++){
     r= rand();
     lattice[i]=((r<p*RAND_MAX)*2-1);    // Cuando sea verdaddes el <  ==> 1*2-1 ==> 1  // Cuando sea falso el < ==> 0*2-1 ==> -1
+    //printf("%d \n", lattice[i]);
     res=res+lattice[i];
   }
   return res;                           //Va a ser la magnetizaciòn osea la cantidad e 1 y -1 de la red
