@@ -6,7 +6,7 @@
 #include "metropolis.h"
 #include "lattice.h"
 int test_pick(int *lattice,int n, int niter);
-int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int niter, int nsaltos, int ks);
+int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int ks, int niter, int nsaltos);
 int test_metropolis(int *lattice, int n, float B, float J, float* LUT, float* p_e, int* p_m);
 
 int main(int argc, char **argv) {
@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
   float J=0;
   float E;
   int M;
-  int niter = 20000;
+  int niter = 2000;
   float B = 0.1;
   srand(time(NULL));
   float LUT[10];
@@ -27,13 +27,14 @@ int main(int argc, char **argv) {
   }
   M=fill_lattice(lattice, n, prob);
   E=energia_0(lattice,n,J,B);
-  printf("E=%f\nM=%d\n", E,M);/*
+  printf("E=%f\nM=%d\n", E,M);
+  /*
   for (int i = 0; i < niter; i++) {
     metropolis(lattice, n, B, LUT, EM);
   }
-  print_lattice(lattice, n);*/
-
-  //test_pick(lattice,n,niter);
+  print_lattice(lattice, n);
+  test_pick(lattice,n,niter);
+  */
   test_correlacion(lattice, n, B, J, LUT, &E, &M, 100, n*n, n*n);
   /*test_metropolis(lattice, n, B,J, LUT, &E, &M);
   printf("%f   %f\n", E, -n*n*B*tanh(B/T));
@@ -57,13 +58,14 @@ fclose(fp);
 free (A);
 }
 
-int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int niter, int nsaltos, int ks){
+int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int ks,int niter, int nsaltos){
   int secs = (unsigned) time(NULL);
   float* CE = (float *) malloc(ks*sizeof(float));
   float* CM = (float *) malloc(ks*sizeof(float));
+  float *corrs = (float *) malloc(2*sizeof(float));
   for(int k=0;k<ks;k++){
     //printf("Voy a calcular la correlacion\n");
-    float *corrs = correlacion(lattice, n, B, J, LUT, p_e, p_m, k+1, niter, nsaltos);
+    corrs = correlacion(lattice, n, B, J, LUT, p_e, p_m, k, niter, nsaltos);
     //printf("Asigne la correlacion\n");
     CE[k] = corrs[0];
     CM[k] = corrs[1];
@@ -71,7 +73,7 @@ int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p
     //printf("Libere la memoria!\n");
   }
   //printf("Calcule todo\n");
-  FILE* fp = fopen("test_correlacion.txt","a");
+  FILE *fp = fopen("test_correlacion.txt","a");
   fprintf(fp, "Test de la funcion de correlacion promediando %d correlaciones, calculadas con %d saltos cada una\nE: ", niter, nsaltos);
   for(int k=0;k<ks-1;k++){
     fprintf(fp, "%f, ", CE[k]);
@@ -91,15 +93,4 @@ int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p
   free(CE);
   free(CM);
   return 0;
-}
-
-int test_metropolis(int *lattice, int n, float B, float J, float* LUT, float* p_e, int* p_m){
-  int res=0;
-  print_lattice(lattice, n);
-  printf("\n\n");
-  for(int i=0;i<10000*n*n;i++){
-    res = res+metropolis(lattice,n,B,J,LUT,p_e,p_m);
-  }
-  print_lattice(lattice, n);
-  return res;
 }
