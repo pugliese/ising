@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
   float T = 2.0;
   float EM[2];
   int niter = 20000;
+  int B=0;
   srand(time(NULL));
   /*
   EM[1]=fill_lattice(lattice, n, prob);
@@ -42,5 +43,3 @@ int test_pick(int *lattice, int n, int niter){
 fclose(fp);
 free (A);
 }
-
-int test_

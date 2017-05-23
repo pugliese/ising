@@ -54,7 +54,7 @@ float energia_0(int *lattice, int n, float B){
 
 float* correlacion(int* lattice, int n, float B, float T, float* EM, int k, int niter, int nsaltos){
   int i,j,m;
-  float corrs= (float *) malloc(2*sizeof(float));
+  float* corrs= (float *) malloc(2*sizeof(float));
   corrs[0]=0;
   corrs[1]=0;
   float MjMjk,EjEjk,Ej,Mj,Ej2,Mj2;
@@ -77,7 +77,7 @@ float* correlacion(int* lattice, int n, float B, float T, float* EM, int k, int 
       MjMjk = MjMjk+Mj*EM[1]/nsaltos;
     }
     corrs[0] = corrs[0]+(EjEjk-Ej*Ej)/(niter*(Ej2-Ej*Ej));
-    corrs[1] = corrs[0]+(MjMjk-Mj*Mj)/(niter*(Mj2-Mj*Mj));
+    corrs[1] = corrs[1]+(MjMjk-Mj*Mj)/(niter*(Mj2-Mj*Mj));
   }
   return corrs;
 }
