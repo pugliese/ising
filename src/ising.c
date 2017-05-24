@@ -8,13 +8,15 @@
 int test_pick(int *lattice,int n, int niter);
 int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int ks, int niter, int nsaltos);
 int test_metropolis(int *lattice, int n, float B, float J, float* LUT, float* p_e, int* p_m);
+int test_vecinos(int n, int idx);
+int test_LUT(float* LUT);
 
 int main(int argc, char **argv) {
   int n = 32;
   int *lattice = malloc(n * n * sizeof(int));
   float prob = 0.5;
   float T = 1;
-  float J=0;
+  float J=1;
   float E;
   int M;
   int niter = 2000;
@@ -24,10 +26,10 @@ int main(int argc, char **argv) {
   for(int i=0;i<5;i++){ // Los posibles valores de los spins de alrededor son 2*i-4 para i=0,..,4 (-4,-2,0,2,4)
     LUT[i] = exp(-(2*(J*(2*i-4)+B))/T);  // Spin positivo
     LUT[i+5] = exp((2*(J*(2*i-4)+B))/T);  // Spin negativo
-  }
+  }/*
   M=fill_lattice(lattice, n, prob);
   E=energia_0(lattice,n,J,B);
-  printf("E=%f\nM=%d\n", E,M);
+  printf("E=%f\nM=%d\n", E,M);*/
   /*
   for (int i = 0; i < niter; i++) {
     metropolis(lattice, n, B, LUT, EM);
@@ -35,7 +37,17 @@ int main(int argc, char **argv) {
   print_lattice(lattice, n);
   test_pick(lattice,n,niter);
   */
-  test_correlacion(lattice, n, B, J, LUT, &E, &M, 100, n*n, n*n);
+  //test_correlacion(lattice, n, B, J, LUT, &E, &M, 100, n*n, n*n);
+  //test_LUT(LUT);
+  /*test_vecinos(3,4);
+  printf("\n");
+  test_vecinos(3,0);
+  printf("\n");
+  test_vecinos(3,2);
+  printf("\n");
+  test_vecinos(3,6);
+  printf("\n");
+  test_vecinos(3,8);*/
   /*test_metropolis(lattice, n, B,J, LUT, &E, &M);
   printf("%f   %f\n", E, -n*n*B*tanh(B/T));
   printf("%d\n", M);*/
@@ -92,5 +104,32 @@ int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p
   fclose(fp);
   free(CE);
   free(CM);
+  return 0;
+}
+
+int test_vecinos(int n, int idx){
+  int* lattice = (int *) malloc(n*n*sizeof(int));
+  for(int i=0;i<n*n;i++){
+    lattice[i] = i;
+  }
+  for(int i=0;i<n;i++){
+    for(int j=0;j<n;j++){
+      printf("%d ", i*n+j);
+    }
+    printf("\n");
+  }
+  printf("El elemento a buscar es el %d\n", idx);
+  suma_vecinos(lattice,n,idx);
+  free(lattice);
+  return 0;
+}
+
+int test_LUT(float* LUT){
+  for(int i=0;i<5;i++){
+    printf("%f  =  ", LUT[i]);
+    printf("%f <---------->", 1/LUT[i+5]);
+    printf("%f  =  ", 1/LUT[i]);
+    printf("%f \n", LUT[i+5]);
+  }
   return 0;
 }

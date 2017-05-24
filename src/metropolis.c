@@ -19,11 +19,12 @@ int pick_site(int *lattice, int n) {  // (float) (rand ()   /RAND_MAX) n*n
 int suma_vecinos(int* lattice, int n,int idx){  // Sumo los spins de los vecinos
   int i = idx/n;    // Fila
   int j = idx%n;    // Columna
-  int f_sup = (i+n)%n;  // Fila del spin superior (la columna es la misma)
+  int f_sup = (i+n-1)%n;  // Fila del spin superior (la columna es la misma)
   int f_inf = (i+1)%n;    // Fila del spin inferior (la columna es la misma)
   int c_der = (j+1)%n;    // Columna del spin derecho (la fila es la misma)
-  int c_izq = (j+n)%n;  // Columna del spin izquierdo (la fila es la misma)
+  int c_izq = (j+n-1)%n;  // Columna del spin izquierdo (la fila es la misma)
   int res=lattice[f_inf*n+j]+lattice[f_sup*n+j]+lattice[i*n+c_der]+lattice[i*n+c_izq];
+  printf("inf: %d \nsup: %d\nder: %d\nizq: %d\n",lattice[f_inf*n+j],lattice[f_sup*n+j],lattice[i*n+c_der],lattice[i*n+c_izq]);
   return res;
   printf("%d\n",res );
 }
