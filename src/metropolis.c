@@ -24,9 +24,9 @@ int suma_vecinos(int* lattice, int n,int idx){  // Sumo los spins de los vecinos
   int c_der = (j+1)%n;    // Columna del spin derecho (la fila es la misma)
   int c_izq = (j+n-1)%n;  // Columna del spin izquierdo (la fila es la misma)
   int res=lattice[f_inf*n+j]+lattice[f_sup*n+j]+lattice[i*n+c_der]+lattice[i*n+c_izq];
-  printf("inf: %d \nsup: %d\nder: %d\nizq: %d\n",lattice[f_inf*n+j],lattice[f_sup*n+j],lattice[i*n+c_der],lattice[i*n+c_izq]);
+  //printf("inf: %d \nsup: %d\nder: %d\nizq: %d\n",lattice[f_inf*n+j],lattice[f_sup*n+j],lattice[i*n+c_der],lattice[i*n+c_izq]);
   return res;
-  printf("%d\n",res );
+  //printf("%d\n",res );
 }
 
 int flip(int *lattice, int n, float B, float J, float* LUT, int idx, float *p_e, int* p_m){
@@ -76,7 +76,7 @@ float energia_0(int *lattice, int n, float J, float B){
 }
 
 float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int niter, int nsaltos){
-  int i,j,m;
+  int i,j,m,ceros=0;
   float* corrs= (float *) malloc(2*sizeof(float));
   corrs[0]=0;
   corrs[1]=0;
@@ -93,7 +93,7 @@ float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e
     for(j=0;j<nsaltos;j++){
       Eo = *p_e;
       Mo = (float) *p_m;
-      Ej = Ej+*p_e/nsaltos;
+      Ej = Ej+(*p_e)/nsaltos;
       Mj = Ej+(float) *p_m/nsaltos;
       Ej2 = Ej2+(*p_e)*(*p_e)/nsaltos;
       Mj2 = Mj2+(float) (*p_m)*(*p_m)/nsaltos;
@@ -106,13 +106,67 @@ float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e
       MjMjk = MjMjk+Mo*(float)(*p_m)/nsaltos;
     }
     if(Ej2-Ej*Ej==0 || Mj2-Mj*Mj==0){
-      printf("dio cero\n" );
+      //printf("dio cero\n" );
+      ceros++;
     }else{
-    corrs[0] = corrs[0]+(EjEjk-Ej*Ej)/(niter*(Ej2-Ej*Ej));
-    corrs[1] = corrs[1]+(MjMjk-Mj*Mj)/(niter*(Mj2-Mj*Mj));
-  }
+      corrs[0] = corrs[0]+(EjEjk-Ej*Ej)/(niter*(Ej2-Ej*Ej));
+      corrs[1] = corrs[1]+(MjMjk-Mj*Mj)/(niter*(Mj2-Mj*Mj));
+    }
   //printf("Puedo calcular una correlacion!!\n");
   }
+  printf("Saltaron %d ceros \n", ceros);
   //printf("Puedo calcular un promedio de correlaciones!\n");
   return corrs;
 }
+/*    FUNCION ALTERNATIVA PARA LA CORRELACION [MODULARIZADA]
+float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int niter, int nsaltos){
+  float* corrs= (float *) malloc(2*sizeof(float));
+  corrs[0]=0;   // Correlacion de la energia
+  corrs[1]=0;   // Correlacion de la magnetizacion
+  float* guarda;
+  for (int i=0;i<niter;i++){
+    guarda=correlacion_una_muestra(lattice,n,B,J,LUT,p_e,p_m,k,nsaltos);
+    corrs[0] = corrs[0]+guarda[0]/niter;   // Correlacion de la energia
+    corrs[1] = corrs[1]+guarda[1]/niter;   // Correlacion de la magnetizacion
+  }
+  return corrs;
+}
+
+float* correlacion_una_muestra(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int nsaltos){
+  float* Ef = malloc(nsaltos*sizeof(float));
+  float* Ei = malloc(nsaltos*sizeof(float));
+  float* Mf = malloc(nsaltos*sizeof(float));  // Defino las magnetizaciones como float
+  float* Mi = malloc(nsaltos*sizeof(float));  // para evitar problemas al dividir
+  for(int i=0;i<nsaltos;i++){
+    Ei[i] = *p_e;
+    Mi[i] = (float) *p_m;
+    for (int j=0;j<k;j++){
+      metropolis(lattice,n,B,J,LUT,p_e,p_m); // Avanzo k pasos
+    }
+    Ef[i] = *p_e;
+    Mf[i] = (float) *p_m;
+  }
+  float* res = malloc(2*sizeof(float));
+  res[0] = coef_corr(Ei, Ef, nsaltos); // Calculo las correlaciones para cada
+  res[1] = coef_corr(Mi, Mf, nsaltos); // observable 0->Energia y 1->Magnetizacion
+  free(Ef);
+  free(Ei);
+  free(Mf);
+  free(Mi);
+  return res;
+}
+
+float coef_corr(float Xi, float Xf, int n){
+  float cruzado = 0; // Terminos cruzados <XjXjk>
+  float X2 = 0;     // Terminos <Xj²>
+  float X = 0;     // Terminos <X>
+  for (int i=0;i<n;i++){
+    cruzado = cruzado + Xi[i]*Xf[i]/n;
+    X2 = X2+Xi[i]*Xi[i]/n;
+    X = X+Xi[i]/n;
+  }
+  float numerador = cruzado - X*X;
+  float denominador = X2-X*X;
+  return (numerador/denominador);
+}
+*/

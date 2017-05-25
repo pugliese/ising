@@ -26,10 +26,10 @@ int main(int argc, char **argv) {
   for(int i=0;i<5;i++){ // Los posibles valores de los spins de alrededor son 2*i-4 para i=0,..,4 (-4,-2,0,2,4)
     LUT[i] = exp(-(2*(J*(2*i-4)+B))/T);  // Spin positivo
     LUT[i+5] = exp((2*(J*(2*i-4)+B))/T);  // Spin negativo
-  }/*
+  }
   M=fill_lattice(lattice, n, prob);
   E=energia_0(lattice,n,J,B);
-  printf("E=%f\nM=%d\n", E,M);*/
+  printf("E=%f\nM=%d\n", E,M);
   /*
   for (int i = 0; i < niter; i++) {
     metropolis(lattice, n, B, LUT, EM);
@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
   print_lattice(lattice, n);
   test_pick(lattice,n,niter);
   */
-  //test_correlacion(lattice, n, B, J, LUT, &E, &M, 100, n*n, n*n);
+  test_correlacion(lattice, n, B, J, LUT, &E, &M, n, n*n, n);
   //test_LUT(LUT);
   /*test_vecinos(3,4);
   printf("\n");
@@ -77,6 +77,7 @@ int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p
   float *corrs = (float *) malloc(2*sizeof(float));
   for(int k=0;k<ks;k++){
     //printf("Voy a calcular la correlacion\n");
+    printf("Arranca %d\n", k);
     corrs = correlacion(lattice, n, B, J, LUT, p_e, p_m, k, niter, nsaltos);
     //printf("Asigne la correlacion\n");
     CE[k] = corrs[0];
