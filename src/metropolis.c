@@ -171,7 +171,7 @@ float coef_corr(float Xi, float Xf, int n){
 }
 */
 
-/*
+
 LO DEJO ASI PORQUE PROBABLEMENTE NO COMPILE,
 Me falta ver bien como poner la magnetizacipon osea
 
@@ -184,11 +184,11 @@ float magnet(int *lattice, int n, float p,float T_max, float T_min, int T_pasos,
     float m_T=0;
     m= (float *) malloc((niter/k)*sizeof(float)); // quiero que  a cada T reinicie los valores no se si esta bienc omo lo hice
     for (int j = 0; j < niter; j++) {
-      if(j==0 || j%k==0 ){ // mi idea es el primero que lo tome y cada k que valla tomando
-        m[j/k]=	;	//me cuesta pensar bien esto  quiero que aca me diga cuanto vale al magnetizacipn pero si uso filllattice no me sirve
+	m[0]=fill_lattice(lattice,n,p);
+        if(j==1 || j%k==0 ){
+          m[j/k]=metropolis(lattice, n,B,J,LUT,p_e,p_m);
+          }
         }
-        else{metropolis(lattice, n,B,J,LUT,p_e,p_m)} // cuando no sea que flipee,
-    }
     for(l=0;l<niter/k;l++){ 		// aca tomo el promedio del array
       m_T=m_T+m[l]/(niter/k);
       }
