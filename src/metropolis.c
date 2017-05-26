@@ -174,26 +174,30 @@ float coef_corr(float Xi, float Xf, int n){
 
 LO DEJO ASI PORQUE PROBABLEMENTE NO COMPILE,
 Me falta ver bien como poner la magnetizacipon osea
-
-float magnet(int *lattice, int n, float p,float T_max, float T_min, int T_pasos,float *LUT, int niter, k,p_e,p_m){
+//k cantidad de pasos que quiero que haga  hasta tomar m
+// niter la cantidad de ventanada de k pasos
+float magnet(int *lattice, int n, float p,float T_max, float T_min, int T_pasos,float B,float J, int niter,int k){
   int i;
+  float* p_m,p_e;
   float* m; // quiero un arrray de para tener los valores que tomo de la magnetizacion
+  float* LUT=malloc( *sizeof(float) )
   FILE *fp = fopen("Magnetizacion.txt","a");
   fprintf(fp, "Magnetizacion para Temperaturas entre %g y %g con un paso de %g \n ", T_max,T_min,T_pasos);
   for(i=T_min;i<T_max;i=i+T_pasos){
     float m_T=0;
-    m= (float *) malloc((niter/k)*sizeof(float)); // quiero que  a cada T reinicie los valores no se si esta bienc omo lo hice
-    for (int j = 0; j < niter; j++) {
-	m[0]=fill_lattice(lattice,n,p);
-        if(j==1 || j%k==0 ){
-          m[j/k]=metropolis(lattice, n,B,J,LUT,p_e,p_m);
-          }
+    //lut
+    m= (float *) malloc((niter)*sizeof(float)); // quiero que  a cada T reinicie los valores no se si esta bienc omo lo hice
+    for (int j = 0; j < niter*k; j++) {
+    	m[0]=fill_lattice(lattice,n,p);
+      metropolis(lattice, n,B,J,LUT,p_e,p_m);
+      if( j%k ==0){
+          m[j%k]=p_m;
         }
-    for(l=0;l<niter/k;l++){ 		// aca tomo el promedio del array
-      m_T=m_T+m[l]/(niter/k);
-      }
+    }
+    for(l=0;l<niter;l++){ 		// aca tomo el promedio del array
+      m_T=m_T+m[l]/(niter);
+    }
   fprintf(fp, "%g ,", m_T);
-
+  free()
   }
 }
-*/
