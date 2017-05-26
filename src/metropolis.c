@@ -40,7 +40,7 @@ int flip(int *lattice, int n, float B, float J, float* LUT, int idx, float *p_e,
   // Si el spin es negativo, lo busca en los ultimos 5. Si es positivo, lo busca en los primeros 5 (no suma 5)
 // Dentro del subarray, accede a la posicion i=S/2+2 que corresponde a vecinos sumando 2*i-4
 // Es más fácil entender esto viendo la definición de la LUT en ising.c
-  if(rand()<proba*RAND_MAX){
+  if(((float)rand())/RAND_MAX<proba){
     res=1;
     lattice[idx]=-lattice[idx];
     *p_e=(*p_e)-2*(J*s+B)*lattice[idx];
@@ -75,6 +75,15 @@ float energia_0(int *lattice, int n, float J, float B){
   return res;
 }
 
+float* LookUpTable(float J, float B, float T){
+  float* res = malloc(10*sizeof(float));
+  for(int i=0;i<5;i++){ // Los posibles valores de los spins de alrededor son 2*i-4 para i=0,..,4 (-4,-2,0,2,4)
+    res[i] = exp(-(2*(J*(2*i-4)+B))/T);  // Spin positivo
+    res[i+5] = exp((2*(J*(2*i-4)+B))/T);  // Spin negativo
+  }
+  return res;
+}
+
 float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int niter, int nsaltos){
   int i,j,m,ceros=0;
   float* corrs= (float *) malloc(2*sizeof(float));
@@ -97,13 +106,13 @@ float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e
       Mj = Ej+(float) *p_m/nsaltos;
       Ej2 = Ej2+(*p_e)*(*p_e)/nsaltos;
       Mj2 = Mj2+(float) (*p_m)*(*p_m)/nsaltos;
-      //printf("Asigne los no XjXjk\n");
+      if(k==30){printf("Asigne los no XjXjk\n");}
       for(m=0;m<k;m++){
         metropolis(lattice,n,B,J,LUT,p_e,p_m); // Avanzo k pasos
       }
-      //printf("Avance los %d pasos\n", k);
+      if(k==30){printf("Avance los %d pasos\n", k);}
       EjEjk = EjEjk+Eo*(*p_e)/nsaltos;
-      MjMjk = MjMjk+Mo*(float)(*p_m)/nsaltos;
+      MjMjk = MjMjk+Mo*((float)(*p_m))/nsaltos;
     }
     if(Ej2-Ej*Ej==0 || Mj2-Mj*Mj==0){
       //printf("dio cero\n" );
@@ -128,6 +137,7 @@ float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e
     guarda=correlacion_una_muestra(lattice,n,B,J,LUT,p_e,p_m,k,nsaltos);
     corrs[0] = corrs[0]+guarda[0]/niter;   // Correlacion de la energia
     corrs[1] = corrs[1]+guarda[1]/niter;   // Correlacion de la magnetizacion
+    free(guarda);
   }
   return corrs;
 }
@@ -156,7 +166,7 @@ float* correlacion_una_muestra(int *lattice, int n, float B, float J, float* LUT
   return res;
 }
 
-float coef_corr(float Xi, float Xf, int n){
+float coef_corr(float* Xi, float* Xf, int n){
   float cruzado = 0; // Terminos cruzados <XjXjk>
   float X2 = 0;     // Terminos <Xj²>
   float X = 0;     // Terminos <X>
@@ -167,9 +177,12 @@ float coef_corr(float Xi, float Xf, int n){
   }
   float numerador = cruzado - X*X;
   float denominador = X2-X*X;
+  if(denominador==0){
+    printf("Salto un 0\n");
+  }
   return (numerador/denominador);
-}
-*/
+}*/
+
 
 
 LO DEJO ASI PORQUE PROBABLEMENTE NO COMPILE,
