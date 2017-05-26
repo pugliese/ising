@@ -15,29 +15,30 @@ int main(int argc, char **argv) {
   int n = 32;
   int *lattice = malloc(n * n * sizeof(int));
   float prob = 0.5;
-  float T = 1;
+  float T = 10;
   float J=1;
   float E;
   int M;
   int niter = 2000;
   float B = 0.1;
-  srand(time(NULL));
+  srand(1);
+  //srand(time(NULL));
   float LUT[10];
   for(int i=0;i<5;i++){ // Los posibles valores de los spins de alrededor son 2*i-4 para i=0,..,4 (-4,-2,0,2,4)
     LUT[i] = exp(-(2*(J*(2*i-4)+B))/T);  // Spin positivo
     LUT[i+5] = exp((2*(J*(2*i-4)+B))/T);  // Spin negativo
   }
   M=fill_lattice(lattice, n, prob);
-  E=energia_0(lattice,n,J,B);
+  E=energia_0(lattice,n,J,B);/*
   printf("E=%f\nM=%d\n", E,M);
-  /*
+
   for (int i = 0; i < niter; i++) {
-    metropolis(lattice, n, B, LUT, EM);
+    metropolis(lattice, n, B, J, LUT, &E, &M);
   }
-  print_lattice(lattice, n);
-  test_pick(lattice,n,niter);
-  */
-  test_correlacion(lattice, n, B, J, LUT, &E, &M, n, n*n, n);
+  print_lattice(lattice, n);*/
+  //test_pick(lattice,n,niter);
+
+  //test_correlacion(lattice, n, B, J, LUT, &E, &M, n, n*n, n*n);
   //test_LUT(LUT);
   /*test_vecinos(3,4);
   printf("\n");
