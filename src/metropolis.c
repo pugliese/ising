@@ -105,6 +105,44 @@ float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e
   //printf("Puedo calcular un promedio de correlaciones!\n");
   return corrs;
 }
+
+int calc_paso(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int niter, int nsaltos){
+  float* corrs;
+  int k=1;
+  float corr_inf_e, corr_sup_e, corr_inf_m, corr_sup_m;
+  corr_inf_e = 1; // El inf es siempre k/2 y para k=1 => inf=0
+  corr_inf_m = 1; // donde la correlacion es total
+  corrs = correlacion(lattice, n, B, J,LUT,p_e,p_m, k, niter, nsaltos);
+  corr_sup_e = corrs[0];
+  corr_sup_m = corrs[1];
+  while (corrs[0]>0.1 && corrs[1]>0.1){  // Equivalente a corr_max = max(corrs[0],corrs[1])>0.1
+    k = 2*k;
+    free(corrs);
+    corrs = correlacion(lattice, n, B, J,LUT,p_e,p_m, k, niter, nsaltos);
+    corr_inf_e = corr_sup_e;
+    corr_inf_m = corr_sup_m;
+    corr_sup_e = corrs[0];
+    corr_sup_m = corrs[1];
+  }
+  free(corrs);
+  int inf = k/2, sup = k, med=0;
+  while (inf+1<sup){
+    // Como ya sali del while anterior, se que max(corr_sup_e, corr_sup_m)>0.1
+    // pero max(corr_inf_e, corr_inf_m)>0.1; busco el minimo k con max_corr(k)>0.1
+    med = (inf+sup)/2;
+    corrs = correlacion(lattice, n, B, J,LUT,p_e,p_m, med, niter, nsaltos);
+    if(corrs[0]>0.1 && corrs[1]>0.1){
+      corr_sup_m = corrs[1];
+      corr_sup_e = corrs[0];
+    }else{
+      corr_inf_m = corrs[1];
+      corr_inf_e = corrs[0];
+    }
+    free(corrs);
+  }
+  return med;
+}
+
 /*    FUNCION ALTERNATIVA PARA LA CORRELACION [MODULARIZADA]
 float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int niter, int nsaltos){
   float* corrs= (float *) malloc(2*sizeof(float));
