@@ -32,10 +32,6 @@ int suma_vecinos(int* lattice, int n,int idx){  // Sumo los spins de los vecinos
 int flip(int *lattice, int n, float B, float J, float* LUT, int idx, float *p_e, int* p_m){
   int res=0;
   int s = suma_vecinos(lattice,n,idx);
-/*   Implementacion con Look-Up Table
-  En teoria, esto puede reemplazar ToDO lo que esta comentado abajo, hay que cambiar
-              float T ---> float* LUT*/
-
   float proba = LUT[s/2+2+5*(1-lattice[idx])/2];
   // Si el spin es negativo, lo busca en los ultimos 5. Si es positivo, lo busca en los primeros 5 (no suma 5)
 // Dentro del subarray, accede a la posicion i=S/2+2 que corresponde a vecinos sumando 2*i-4
@@ -47,24 +43,6 @@ int flip(int *lattice, int n, float B, float J, float* LUT, int idx, float *p_e,
     *p_m=(*p_m)+2*lattice[idx];
   }
   return res;
-
-/*
-  float deltaE = 2*(s+B)*lattice[idx];
-  if (deltaE<=0){
-    res=1;
-    lattice[idx]=-lattice[idx];
-    *p_e=*p_e +deltaE;
-    *p_m=*p_m+2*lattice[idx];
-  }else{
-    int r = rand();
-    res = (r<exp(-deltaE/T)*RAND_MAX);    // Si es verdadero (1), acepto
-    if(res){
-      lattice[idx] = -lattice[idx];
-      *p_e=*p_e +deltaE;
-      *p_m=*p_m+2*lattice[idx];
-    }
-  }
-  return res;*/
 }
 
 float energia_0(int *lattice, int n, float J, float B){

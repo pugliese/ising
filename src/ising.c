@@ -5,6 +5,7 @@
 #include <math.h>
 #include "metropolis.h"
 #include "lattice.h"
+#include "ejercicios.h"
 int test_pick(int *lattice,int n, int niter);
 int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int ks, int niter, int nsaltos);
 int test_metropolis(int *lattice, int n, float B, float J, float* LUT, float* p_e, int* p_m);
@@ -28,29 +29,6 @@ int main(int argc, char **argv) {
   M=fill_lattice(lattice, n, prob);
   E=energia_0(lattice,n,J,B);
   magnet(lattice, n, prob, 3, 1.5, 501, 0, J, 1000,20000);
-  /*
-  printf("E=%f\nM=%d\n", E,M);
-
-  for (int i = 0; i < niter; i++) {
-    metropolis(lattice, n, B, J, LUT, &E, &M);
-  }
-  print_lattice(lattice, n);*/
-  //test_pick(lattice,n,niter);
-
-  //test_correlacion(lattice, n, B, J, LUT, &E, &M, n, n*n, n*n);
-  //test_LUT(LUT);
-  /*test_vecinos(3,4);
-  printf("\n");
-  test_vecinos(3,0);
-  printf("\n");
-  test_vecinos(3,2);
-  printf("\n");
-  test_vecinos(3,6);
-  printf("\n");
-  test_vecinos(3,8);*/
-  /*test_metropolis(lattice, n, B,J, LUT, &E, &M);
-  printf("%f   %f\n", E, -n*n*B*tanh(B/T));
-  printf("%d\n", M);*/
   free (lattice);
   return 0;
 }
