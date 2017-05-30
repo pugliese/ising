@@ -5,7 +5,6 @@
 #include <math.h>
 #include "metropolis.h"
 #include "lattice.h"
-#include "ejercicios.h"
 int test_pick(int *lattice,int n, int niter);
 int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int ks, int niter, int nsaltos);
 int test_metropolis(int *lattice, int n, float B, float J, float* LUT, float* p_e, int* p_m);
@@ -18,7 +17,7 @@ int main(int argc, char **argv) {
   int *lattice = malloc(n * n * sizeof(int));
   float prob = 0.5;
   float T = 10;
-  float J=1;
+  float J=0;
   float E;
   int M;
   int niter = 2000;
@@ -28,7 +27,9 @@ int main(int argc, char **argv) {
   float* LUT =LookUpTable(J,B,T);
   M=fill_lattice(lattice, n, prob);
   E=energia_0(lattice,n,J,B);
-  magnet(lattice, n, prob, 3, 1.5, 501, 0, J, 1000,20000);
+
+  magnet(lattice, n, prob, 3, 1.5, 251  , 1 , J, 1000,20000);
+
   free (lattice);
   return 0;
 }
@@ -114,10 +115,6 @@ int test_LUT(float* LUT){
 }
 
 
-// LO DEJO ASI PORQUE PROBABLEMENTE NO COMPILE,
-// Me falta ver bien como poner la magnetizacipon osea
-// k cantidad de pasos que quiero que haga  hasta tomar m
-// niter la cantidad de ventanada de k pasos
 float magnet(int *lattice, int n, float p,float T_max, float T_min, int T_pasos,float B,float J, int niter,int k){
   float Ti;
   int M = fill_lattice(lattice,n,p);
