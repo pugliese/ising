@@ -6,7 +6,7 @@ LD = $(CC)
 SOURCE_C = $(wildcard *.c)
 OBJECTS_C = $(patsubst %.c, ../bin/%_c.o, $(SOURCE_C))
 
-FLAGS = -std=gnu99 -O3
+CFLAGS = -std=gnu99 -O3
 EXECUTABLE = ../bin/ising.e
 
 default: help
