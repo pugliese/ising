@@ -14,11 +14,11 @@ int pick_site(int *lattice, int n) {  // (float) (rand ()   /RAND_MAX) n*n
   int dim = n*n;
   int r = rand();
   int res = (int) ((((float) r)/RAND_MAX)*n*n);
-  while (res == dim){
+  /*while (res == dim){
     r = rand();
     res = (int) ((((float) r)/RAND_MAX)*n*n);
-  }
-  return res;
+  }*/
+  return (res%(n*n));
 }
 
 
@@ -30,10 +30,7 @@ int suma_vecinos(int* lattice, int n,int idx){  // Sumo los spins de los vecinos
   int c_der = (j+1)%n;    // Columna del spin derecho (la fila es la misma)
   int c_izq = (j+n-1)%n;  // Columna del spin izquierdo (la fila es la misma)
   int res=lattice[f_inf*n+j]+lattice[f_sup*n+j]+lattice[i*n+c_der]+lattice[i*n+c_izq];
-  //if (f_sup<n && f_inf<n && c_der<n && c_izq<n && f_sup>=0 && f_inf>=0 && c_der>=0 && c_izq>=0){}else{printf("Cagamos\n");}
-  //printf("inf: %d \nsup: %d\nder: %d\nizq: %d\n",lattice[f_inf*n+j],lattice[f_sup*n+j],lattice[i*n+c_der],lattice[i*n+c_izq]);
   return res;
-  //printf("%d\n",res );
 }
 
 int flip(int *lattice, int n, float B, float J, float* LUT, int idx, float *p_e, int* p_m){
