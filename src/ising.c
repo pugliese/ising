@@ -12,6 +12,7 @@ int test_metropolis(int *lattice, int n, float B, float J, float* LUT, float* p_
 int test_vecinos(int n, int idx);
 int test_LUT(float* LUT);
 float magnet(int *lattice, int n, float p,float T_max, float T_min, int T_pasos,float B,float J, int niter,int k);
+int test_pick_2(int *lattice, int n, int niter);
 
 int main(int argc, char **argv) {
   int n = 32;
@@ -35,28 +36,46 @@ int main(int argc, char **argv) {
   //printf("%p\n", (void *) lattice);
   //magnet(lattice, n, prob, 3, 1.5, 251  , 1 , J, 1000,20000);
   //ej_2b(lattice, n, 0.1, 0.6, 6, n*n, n*n);
+<<<<<<< HEAD
   //int secs = time(NULL);
   //int paso = calc_paso(lattice, n, B, J, LUT, &E, &M, 10*n, 10*n);
   //secs = time(NULL)-secs;
   //  printf("Biseccion: %d en %d min, %d segs\n", paso, secs/60, secs%60);
+
+  int secs = time(NULL);
+  test_pick_2(lattice,n,2000000000);
+  printf("%f\n", (double)RAND_MAX+1.0);
+  //int paso = calc_paso(lattice, n, B, J, LUT, &E, &M, 100, n*n);
+  secs = time(NULL)-secs;
+  //printf("Biseccion: %d en %d min, %d segs\n", paso, secs/60, secs%60);
+  printf("%d segs\n", secs);
+
   free(LUT);
   free (lattice);
   return 0;
 }
 
 int test_pick(int *lattice, int n, int niter){
-  int *A = malloc(niter*sizeof(int));
-    for (int i=0;i<niter;i++){
-      A[i]= pick_site(lattice, n);
-    }
-    FILE* fp = fopen("Test_pick.txt","a");
-    fprintf(fp,"Test de la funciòn pick, con %d iteraciones \n", niter );
-    for(int j=0; j< niter-1; j++) {
-      fprintf(fp, "%d ,", A[j]);
-    }
-    fprintf(fp, "%d \n", A[niter-1]);
- fclose(fp);
- free (A);
+
+  int A;
+  FILE* fp = fopen("Test_pick.txt","a");
+  fprintf(fp,"Test de la funciòn pick, con %d iteraciones \n", niter );
+  for (int i=0;i<niter-1;i++){
+    A= pick_site(lattice, n);
+    fprintf(fp, "%d ,", A);
+  }
+  A= pick_site(lattice, n);
+  fprintf(fp, "%d\n\n", A);
+  fclose(fp);
+}
+
+int test_pick_2(int *lattice, int n, int niter){
+  int paso=0, dim = n*n, i=0;
+  for(int j=0;j<niter;j++){
+    paso = pick_site(lattice, n);
+    i=i+(paso==dim);
+  }
+  printf("Iteraciones=%d -> %d\n", niter, i);
 }
 
 int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int ks,int niter, int nsaltos){
