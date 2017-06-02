@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
   int *lattice = malloc(n * n * sizeof(int));
   float prob = 0.5;
   float T = 1;
-  float J=0.01;
+  float J=0.1;
   float E;
   int M;
   int niter = 2000;
@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
   //magnet(lattice, n, prob, 3, 1.5, 251  , 1 , J, 1000,20000);
   //ej_2b(lattice, n, 0.1, 0.6, 6, n*n, n*n);
   int secs = time(NULL);
-  int paso = calc_paso(lattice, n, B, J, LUT, &E, &M, 10*n, 10*n);
+  int paso = calc_paso(lattice, n, B, J, LUT, &E, &M, n*n, n*n);
   secs = time(NULL)-secs;
   printf("Biseccion: %d en %d min, %d segs\n", paso, secs/60, secs%60);
   free(LUT);

@@ -11,7 +11,13 @@ int metropolis(int *lattice, int n, float B, float J, float* LUT, float *p_e, in
 }
 
 int pick_site(int *lattice, int n) {  // (float) (rand ()   /RAND_MAX) n*n
-  int res = (int) (((float) rand()/RAND_MAX)*n*n);
+  int dim = n*n;
+  int r = rand();
+  int res = (int) ((((float) r)/RAND_MAX)*n*n);
+  while (res == dim){
+    r = rand();
+    res = (int) ((((float) r)/RAND_MAX)*n*n);
+  }
   return res;
 }
 
