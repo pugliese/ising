@@ -33,8 +33,8 @@ int ej_2b(int *lattice, int n, float J_min, float J_max, int m, int niter, int n
 }
 
 
-int ejercicio_2a(int *lattice, int n, float p,float T_max, float T_min, int T_pasos,float B, float J,int niter,int k){
   float Ti;
+int ej_2a(int *lattice, int n, float p,float T_max, float T_min, int T_pasos,float B, float J,int niter,int k){
   float* LUT;
   FILE *fp = fopen("Ejercicio2a.txt","a");
   float T_step = (T_max-T_min)/(T_pasos-1);
@@ -51,15 +51,15 @@ int ejercicio_2a(int *lattice, int n, float p,float T_max, float T_min, int T_pa
         for (int j = 0; j < k; j++){
           metropolis(lattice, n,B,J,LUT,&E,&M);
           m_e[j] = m_e[j] +((float) M)/niter;
-          }
         }
+      }
         for (int j=0; j<k ;j++){
           fprintf(fp, "%g ,", m_e[j]);
         }
         fprintf(fp,"\n");
         free(m_e);
         free(LUT);
-      }
+    }
   secs = time(NULL)-secs;
   fprintf(fp, "\nEl calculo tomo %d hs, %d min, %d secs\n\n", secs/3600, (secs/60) % 60, secs % 60);
   fclose(fp);

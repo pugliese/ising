@@ -17,8 +17,8 @@ int main(int argc, char **argv) {
   int n = 32;
   int *lattice = malloc(n * n * sizeof(int));
   float prob = 0.5;
-  float T = 1;
-  float J=0.1;
+  float T =1;
+  float J=0.01;
   float E;
   int M;
   int niter = 2000;
@@ -28,14 +28,17 @@ int main(int argc, char **argv) {
   float* LUT =LookUpTable(J,B,T);
   M=fill_lattice(lattice, n, prob);
   E=energia_0(lattice,n,J,B);
-  printf("%p\n", (void *) lattice);
 
+//  ej_2a(lattice, n,  prob,3,  1,  30, 1,  0, 1000,10000 );
+  magnet(lattice,n,prob,3,0.5,400,0,0.3,10000,2200);
+
+  //printf("%p\n", (void *) lattice);
   //magnet(lattice, n, prob, 3, 1.5, 251  , 1 , J, 1000,20000);
   //ej_2b(lattice, n, 0.1, 0.6, 6, n*n, n*n);
-  int secs = time(NULL);
-  int paso = calc_paso(lattice, n, B, J, LUT, &E, &M, n*n, n*n);
-  secs = time(NULL)-secs;
-  printf("Biseccion: %d en %d min, %d segs\n", paso, secs/60, secs%60);
+  //int secs = time(NULL);
+  //int paso = calc_paso(lattice, n, B, J, LUT, &E, &M, 10*n, 10*n);
+  //secs = time(NULL)-secs;
+  //  printf("Biseccion: %d en %d min, %d segs\n", paso, secs/60, secs%60);
   free(LUT);
   free (lattice);
   return 0;
@@ -52,8 +55,8 @@ int test_pick(int *lattice, int n, int niter){
       fprintf(fp, "%d ,", A[j]);
     }
     fprintf(fp, "%d \n", A[niter-1]);
-fclose(fp);
-free (A);
+ fclose(fp);
+ free (A);
 }
 
 int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int ks,int niter, int nsaltos){
@@ -121,30 +124,42 @@ int test_LUT(float* LUT){
   return 0;
 }
 
-
-
 float magnet(int *lattice, int n, float p,float T_max, float T_min, int T_pasos,float B,float J, int niter,int k){
-  float Ti;
+  float Ti=T_min;
   int M = fill_lattice(lattice,n,p);
   float E = energia_0(lattice,n,J,B);
   float* LUT;
   FILE *fp = fopen("Magnetizacion.txt","a");
   float T_step = (T_max-T_min)/(T_pasos-1);
-  fprintf(fp, "Magnetizacion para Temperaturas entre %g y %g con %d pasos \n ", T_max,T_min,T_pasos);
+  fprintf(fp, "Magnetizacion para Temperaturas entre %g y %g con %d pasos con J=%f \n ", T_max,T_min,T_pasos,J);
   int secs = time(NULL);
-  for(Ti=T_min;Ti<=T_max;Ti=Ti+T_step){
+  float *ener_t= malloc (T_pasos*sizeof(float));
+  for(int k=0;k<T_pasos;k++){
+    Ti=T_min+k*T_step;
     float m_T=0;
+    float e_T=0;
     LUT = LookUpTable(J,B,Ti);
+    for (int i=0;i<3000;i++){
+      metropolis(lattice, n,B,J,LUT,&E,&M);
+    }
     for (int j = 0; j < niter; j++){
       for(int l=0;l<k;l++){
         metropolis(lattice, n,B,J,LUT,&E,&M);
       }
       m_T = m_T+((float)M)/niter;
+      e_T = e_T+((float)E)/niter;
     }
+  ener_t[k]=e_T;
   fprintf(fp, "%g ,", m_T);
   printf("%g finalizado\n", Ti);
   free(LUT);
   }
+  fprintf(fp, "\n Energia para Temperaturas entre %g y %g con %d pasos con J=%f \n ", T_max,T_min,T_pasos,J);
+  for(int i=0;i<T_pasos;i++){
+    fprintf(fp, "%g ,", ener_t[i]);
+    printf("%d finalizado\n", i);
+  }
+  free(ener_t);
   secs = time(NULL)-secs;
   fprintf(fp, "\nEl calculo tomo %d hs, %d min, %d secs\n\n", secs/3600, (secs/60) % 60, secs % 60);
   fclose(fp);
