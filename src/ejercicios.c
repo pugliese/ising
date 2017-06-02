@@ -18,12 +18,13 @@ int ej_2b(int *lattice, int n, float J_min, float J_max, int m, int niter, int n
     LUT = LookUpTable(J,0,1);
     M = fill_lattice(lattice,n,0.5);
     E = energia_0(lattice,n,J,0);
-    /* Termalizo, por ahora avanzo 2000 puntos */
-    for(int j=0;j<2000;j++){
+    /* Termalizo, por ahora avanzo 1000 puntos */
+    for(int j=0;j<1000;j++){
       metropolis(lattice, n, 0, J, LUT, &E, &M);
     }
     paso = calc_paso(lattice, n, 0, J, LUT, &E, &M, niter, nsaltos);
     fprintf(fp, "%d, ", paso);
+    printf("%f terminado -> %d\n", J, paso);
     free(LUT);
   }
   secs = time(NULL)-secs;

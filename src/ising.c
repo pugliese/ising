@@ -5,6 +5,7 @@
 #include <math.h>
 #include "metropolis.h"
 #include "lattice.h"
+#include "ejercicios.h"
 int test_pick(int *lattice,int n, int niter);
 int test_correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int ks, int niter, int nsaltos);
 int test_metropolis(int *lattice, int n, float B, float J, float* LUT, float* p_e, int* p_m);
@@ -16,20 +17,26 @@ int main(int argc, char **argv) {
   int n = 32;
   int *lattice = malloc(n * n * sizeof(int));
   float prob = 0.5;
-  float T = 10;
-  float J=0;
+  float T = 1;
+  float J=0.01;
   float E;
   int M;
   int niter = 2000;
-  float B = 0.1;
+  float B = 0;
   //srand(1);
   srand(time(NULL));
   float* LUT =LookUpTable(J,B,T);
   M=fill_lattice(lattice, n, prob);
   E=energia_0(lattice,n,J,B);
+  printf("%p\n", (void *) lattice);
 
-  magnet(lattice, n, prob, 3, 1.5, 251  , 1 , J, 1000,20000);
-
+  //magnet(lattice, n, prob, 3, 1.5, 251  , 1 , J, 1000,20000);
+  //ej_2b(lattice, n, 0.1, 0.6, 6, n*n, n*n);
+  int secs = time(NULL);
+  int paso = calc_paso(lattice, n, B, J, LUT, &E, &M, 10*n, 10*n);
+  secs = time(NULL)-secs;
+  printf("Biseccion: %d en %d min, %d segs\n", paso, secs/60, secs%60);
+  free(LUT);
   free (lattice);
   return 0;
 }
@@ -113,6 +120,7 @@ int test_LUT(float* LUT){
   }
   return 0;
 }
+
 
 
 float magnet(int *lattice, int n, float p,float T_max, float T_min, int T_pasos,float B,float J, int niter,int k){

@@ -24,6 +24,7 @@ int suma_vecinos(int* lattice, int n,int idx){  // Sumo los spins de los vecinos
   int c_der = (j+1)%n;    // Columna del spin derecho (la fila es la misma)
   int c_izq = (j+n-1)%n;  // Columna del spin izquierdo (la fila es la misma)
   int res=lattice[f_inf*n+j]+lattice[f_sup*n+j]+lattice[i*n+c_der]+lattice[i*n+c_izq];
+  //if (f_sup<n && f_inf<n && c_der<n && c_izq<n && f_sup>=0 && f_inf>=0 && c_der>=0 && c_izq>=0){}else{printf("Cagamos\n");}
   //printf("inf: %d \nsup: %d\nder: %d\nizq: %d\n",lattice[f_inf*n+j],lattice[f_sup*n+j],lattice[i*n+c_der],lattice[i*n+c_izq]);
   return res;
   //printf("%d\n",res );
@@ -61,12 +62,12 @@ float* LookUpTable(float J, float B, float T){
   }
   return res;
 }
-
+/*
 float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int niter, int nsaltos){
   int i,j,m,ceros=0;
   float* corrs= (float *) malloc(2*sizeof(float));
-  corrs[0]=0;
-  corrs[1]=0;
+  corrs[0]=1;
+  corrs[1]=1;
   float MjMjk,EjEjk,Ej,Mj,Ej2,Mj2,Eo,Mo;
   for(i=0;i<niter;i++){
     MjMjk = 0;   // Productos cruzados entre X[j] y X[j+k]
@@ -81,14 +82,12 @@ float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e
       Eo = *p_e;
       Mo = (float) *p_m;
       Ej = Ej+(*p_e)/nsaltos;
-      Mj = Ej+(float) *p_m/nsaltos;
+      Mj = Ej+(float) (*p_m)/nsaltos;
       Ej2 = Ej2+(*p_e)*(*p_e)/nsaltos;
-      Mj2 = Mj2+(float) (*p_m)*(*p_m)/nsaltos;
-      if(k==30){printf("Asigne los no XjXjk\n");}
+      Mj2 = Mj2+((float) (*p_m)*(*p_m))/nsaltos;
       for(m=0;m<k;m++){
         metropolis(lattice,n,B,J,LUT,p_e,p_m); // Avanzo k pasos
       }
-      if(k==30){printf("Avance los %d pasos\n", k);}
       EjEjk = EjEjk+Eo*(*p_e)/nsaltos;
       MjMjk = MjMjk+Mo*((float)(*p_m))/nsaltos;
     }
@@ -104,7 +103,7 @@ float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e
   printf("Saltaron %d ceros \n", ceros);
   //printf("Puedo calcular un promedio de correlaciones!\n");
   return corrs;
-}
+}*/
 
 int calc_paso(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int niter, int nsaltos){
   float* corrs;
@@ -115,7 +114,7 @@ int calc_paso(int *lattice, int n, float B, float J, float* LUT, float *p_e, int
   corrs = correlacion(lattice, n, B, J,LUT,p_e,p_m, k, niter, nsaltos);
   corr_sup_e = corrs[0];
   corr_sup_m = corrs[1];
-  while (corrs[0]>0.1 && corrs[1]>0.1){  // Equivalente a corr_max = max(corrs[0],corrs[1])>0.1
+  while (corrs[0]>0.1 || corrs[1]>0.1){  // Equivalente a corr_max = max(corrs[0],corrs[1])>0.1
     k = 2*k;
     free(corrs);
     corrs = correlacion(lattice, n, B, J,LUT,p_e,p_m, k, niter, nsaltos);
@@ -126,24 +125,27 @@ int calc_paso(int *lattice, int n, float B, float J, float* LUT, float *p_e, int
   }
   free(corrs);
   int inf = k/2, sup = k, med=0;
+  printf("Ahora busco entre %d y %d \n", k/2,k);
   while (inf+1<sup){
     // Como ya sali del while anterior, se que max(corr_sup_e, corr_sup_m)>0.1
     // pero max(corr_inf_e, corr_inf_m)>0.1; busco el minimo k con max_corr(k)>0.1
     med = (inf+sup)/2;
     corrs = correlacion(lattice, n, B, J,LUT,p_e,p_m, med, niter, nsaltos);
-    if(corrs[0]>0.1 && corrs[1]>0.1){
+    if(corrs[0]<0.1 && corrs[1]<0.1){
       corr_sup_m = corrs[1];
       corr_sup_e = corrs[0];
+      sup = med;
     }else{
       corr_inf_m = corrs[1];
       corr_inf_e = corrs[0];
+      inf = med;
     }
     free(corrs);
   }
   return med;
 }
 
-/*    FUNCION ALTERNATIVA PARA LA CORRELACION [MODULARIZADA]
+/*    FUNCION ALTERNATIVA PARA LA CORRELACION [MODULARIZADA]*/
 float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int niter, int nsaltos){
   float* corrs= (float *) malloc(2*sizeof(float));
   corrs[0]=0;   // Correlacion de la energia
@@ -193,8 +195,5 @@ float coef_corr(float* Xi, float* Xf, int n){
   }
   float numerador = cruzado - X*X;
   float denominador = X2-X*X;
-  if(denominador==0){
-    printf("Salto un 0\n");
-  }
   return (numerador/denominador);
-}*/
+}
