@@ -9,6 +9,9 @@ float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e
 int calc_paso(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int niter, int nsaltos);
 float* LookUpTable(float J, float B, float T);
 
+int graf_corr(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int niter, int nsaltos);
+float coef_corr_k(float* X, int N, int k, int nsaltos);
+
 float* correlacion_una_muestra(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int nsaltos);
 float coef_corr(float* Xi, float* Xf, int n);
 #endif

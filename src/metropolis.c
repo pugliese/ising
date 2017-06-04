@@ -200,3 +200,139 @@ float coef_corr(float* Xi, float* Xf, int n){
   float denominador = X2-X*X;
   return (numerador/denominador);
 }
+
+int graf_corr(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int niter, int nsaltos){
+  int i, j;
+  int N = nsaltos*k;
+  float* E = malloc(N*sizeof(float));
+  float* M = malloc(N*sizeof(float));
+  float* corrs_E = malloc(k*sizeof(float));
+  float* corrs_M = malloc(k*sizeof(float));
+  for(i=0;i<k;i++){
+    corrs_E[k]=0;
+    corrs_M[k]=0;
+  }
+  for(i=0;i<niter;i++){
+    for(j=0;j<N;j++){
+      metropolis(lattice,n,B,J,LUT,p_e,p_m);
+      E[j]=*p_e;
+      M[j]=(float) *p_m;
+    }
+    for(j=0;j<k;j++){
+      corrs_E[j] = corrs_E[j]+coef_corr_k(E, N, j, nsaltos)/niter;
+      corrs_M[j] = corrs_M[j]+coef_corr_k(M, N, j, nsaltos)/niter;
+    }
+  }
+  FILE* fp = fopen("Correlaciones.txt","a");
+  fprintf(fp, "Correlaciones hasta %d pasos\n", k);
+  for(j=0;j<k-1;j++){
+    fprintf(fp, "%f, ", corrs_E[j]);
+  }
+  fprintf(fp, "%f\n", corrs_E[k-1]);
+  for(j=0;j<k-1;j++){
+    fprintf(fp, "%f, ", corrs_M[j]);
+  }
+  fprintf(fp, "%f\n", corrs_M[k-1]);
+  fclose(fp);
+  free(E);
+  free(M);
+  free(corrs_M);
+  free(corrs_E);
+  return 0;
+}
+
+float coef_corr_k(float* X, int N, int k, int nsaltos){
+// Aca necesitamos N=ancho*nsaltos con N la longitud de X y ancho el
+// espacio entre puntos iniciales (obviamente, k<=ancho)
+  int i,j;
+  int ancho = N/nsaltos;
+  float cruzado = 0; // Terminos cruzados <XjXjk>
+  float X2 = 0;     // Terminos <Xj²>
+  float Xo = 0;     // Terminos <Xj>
+  for(i=0;i<N;i=i+ancho){
+    cruzado = cruzado+X[i]*X[i+k]/nsaltos;
+    X2 = X2+X[i]*X[i]/nsaltos;
+    Xo = Xo+X[i]/nsaltos;
+  }
+  float numerador = cruzado-Xo*Xo;
+  float denominador = X2-Xo*Xo;
+  return (numerador/denominador);
+}
+
+/*
+int graf_corr_2(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int niter, int nsaltos){
+  int i,j;
+  float* corrs_E, corrs_M;
+  float* res_E = malloc(k*sizeof(float));
+  float* res_M = malloc(k*sizeof(float));
+  for(i=0;i<niter;i++){
+    correlaciones(lattice,n,B,J,LUT,p_e,p_m,k,nsaltos,corrs_E,corrs_M);
+    for(j=0;j<k;j++){
+      res_E[j]=res_E[j]+corrs_E[j]/niter;
+      res_M[j]=res_M[j]+corrs_M[j]/niter;
+    }
+  }
+  free(corrs_E);
+  free(corrs_M);
+  free(res_M);
+  free(res_E);
+  return 0;
+}
+
+
+int correlaciones(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int nsaltos, float* corrs_e, float* corrs_m){
+  int i,j;
+  int N=nsaltos*k; // Cantidad total de pasos de metropolis
+  float cruzados_E = 0;
+  float cruzados_M = 0;
+  float E2 = 0;
+  float M2 = 0;
+  float* E = malloc((k+1)*sizeof(float));
+  float* M = malloc((k+1)*sizeof(float));
+  for(i=0;i<nsaltos;i++){
+
+  }
+  return 0;
+}
+
+int graf_corr_contiguo(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int niter, int nsaltos){
+  int i,j;
+  int N = k+nsaltos; // Cantidad total de pasos de metropolis
+  float* E = malloc(N*sizeof(float));
+  float* M = malloc(N*sizeof(float));
+  float* corrs_E = malloc(k*sizeof(float));
+  float* corrs_M = malloc(k*sizeof(float));
+  for(i=0;i<k;i++){
+    corrs_E[k]=0;
+    corrs_M[k]=0;
+  }
+  for(i=0;i<niter;i++){
+    for(j=0;j<N;j++){
+      metropolis(lattice,n,B,J,LUT,p_e,p_m);
+      E[j]=*p_e;
+      M[j]=(float) *p_m;
+    }
+    for(j=0;j<k;j++){
+      corrs_E[k] = corrs_E[k]+coef_corr_contig(E, N, k+1, nsaltos)/niter;
+      corrs_M[k] = corrs_M[k]+coef_corr_contig(M, N, k+1, nsaltos)/niter;
+    }
+  }
+  free(E);
+  free(M);
+  return 0;
+  }
+
+float coef_corr_contig(float* X, int N, int k, int nsaltos){
+  int i,j;
+  float cruzados = 0;
+  float X2 = 0;
+  float Xo = 0;
+  for(i=0;i<nsaltos;i++){
+    cruzados = cruzados + X[i]*X[i+k]/nsaltos;
+    X2 = X2 + X[i]*X[i]/nsaltos;
+    Xo = Xo + X[i]/nsaltos;
+  }
+  float res = (cruzados-Xo*Xo)/(X2-Xo*Xo);
+  return res;
+}
+*/
