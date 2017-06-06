@@ -8,6 +8,7 @@ int suma_segundos_vecinos(int* lattice, int n,int idx);
 int flip(int *lattice, int n, float B, float J, float* LUT, int idx, float *p_e, int* p_m);
 int flip_segundos_vecinos(int *lattice, int n, float B, float J, float* LUT,float* LUT2, int idx, float *p_e, int* p_m);
 float energia_0(int *lattice,int n, float J, float B);
+float energia_0_segundos_vecinos(int *lattice, int n, float J, float B);
 float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int niter, int nsaltos);
 int calc_paso(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int* k, int niter, int nsaltos);
 float* LookUpTable(float J, float B, float T);

@@ -36,11 +36,64 @@ int main(int argc, char **argv) {
   //printf("%p\n", (void *) lattice);
   //magnet(lattice, n, prob, 3, 1.5, 251  , 1 , J, 1000,20000);
 
-  ej_2b(lattice, n, 0.52, 0.6, 5, 6*n*n, 300, n*n);
+  ej_2b(lattice, n, 0.5, 0.6, 6, 8*n*n, 500, n*n);
   //int secs = time(NULL);
   //int paso = calc_paso(lattice, n, B, J, LUT, &E, &M, 10*n, 10*n);
   //secs = time(NULL)-secs;
   //  printf("Biseccion: %d en %d min, %d segs\n", paso, secs/60, secs%60);
+
+  int Programa;
+  sscanf(argv[1], "%x", &Programa);
+
+
+  if(Programa == 42){
+    float T_max, T_min;
+    int T_pasos,k,*lattice2;
+    sscanf(argv[2], "%d", &n);
+    sscanf(argv[3], "%f", &prob);
+    sscanf(argv[4], "%f", &T_min);
+    sscanf(argv[5], "%f", &T_max);
+    sscanf(argv[6], "%d", &T_pasos);
+    sscanf(argv[7], "%f", &B);
+    sscanf(argv[8], "%d", &niter);
+    sscanf(argv[9], "%d", &k);
+    lattice2 = (int *) malloc(n*n*sizeof(int));
+    ej_2a(lattice2, n,  prob, T_max,  T_min,  T_pasos, B,  0, niter, k);
+    free(lattice2);
+  }
+
+  if(Programa == 43){
+    float J_max, J_min;
+    int m,k,*lattice2;
+    sscanf(argv[2], "%d", &n);
+    sscanf(argv[3], "%f", &J_min);
+    sscanf(argv[4], "%f", &J_max);
+    sscanf(argv[5], "%d", &m);
+    sscanf(argv[6], "%d", &k);
+    sscanf(argv[7], "%d", &niter);
+    sscanf(argv[8], "%d", &nsaltos);
+    lattice2 = (int *) malloc(n*n*sizeof(int));
+    ej_2b(lattice2, n, J_min, J_max, m, k, niter, nsaltos);
+    free(lattice2);
+  }
+  
+  if(Programa == 44){
+    float J_max, J_min, T;
+    int m,k,*lattice2;
+    sscanf(argv[2], "%d", &n);
+    sscanf(argv[3], "%f", &T);
+    sscanf(argv[4], "%f", &J_min);
+    sscanf(argv[5], "%f", &J_max);
+    sscanf(argv[6], "%d", &m);
+    sscanf(argv[7], "%f", &B);
+    sscanf(argv[8], "%d", &niter);
+    sscanf(argv[9], "%d", &k);
+    lattice2 = (int *) malloc(n*n*sizeof(int));
+    ej_2c(lattice, n, 0.5,T, J_min,J_max, m, B,niter,k);
+    free(lattice2);
+  }
+
+
   free(LUT);
   free (lattice);
 
