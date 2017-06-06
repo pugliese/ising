@@ -31,10 +31,11 @@ int main(int argc, char **argv) {
   E=energia_0(lattice,n,J,B);
 
 //  ej_2a(lattice, n,  prob,3,  1,  30, 1,  0, 1000,10000 );
-//  ej_2c(lattice,n,prob,3,0.5,400,0,0.3,10000,2200);
+//  ej_2c(lattice,n,prob,1,0.1,0.6,100,0,10000,2200);
 
   //printf("%p\n", (void *) lattice);
   //magnet(lattice, n, prob, 3, 1.5, 251  , 1 , J, 1000,20000);
+
   ej_2b(lattice, n, 0.44, 0.6, 9, 2000*n*n, 100, n*n);
   /*int secs = time(NULL);
   int rango=300*n*n;
