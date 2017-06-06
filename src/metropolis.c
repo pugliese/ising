@@ -10,9 +10,9 @@ int metropolis(int *lattice, int n, float B, float J, float* LUT, float *p_e, in
   return res;
 }
 
-int metropolis_segundos_vecinos(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m){
+int metropolis_segundos_vecinos(int *lattice, int n, float B, float J, float* LUT, float* LUT2,float *p_e, int* p_m){
   int idx = pick_site(lattice, n);
-  int res = flip_segundos_vecinos(lattice, n, B, J, LUT, idx, p_e, p_m);
+  int res = flip_segundos_vecinos(lattice, n, B, J, LUT,LUT2, idx, p_e, p_m);
   return res;
 }
 

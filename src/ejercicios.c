@@ -18,6 +18,9 @@ int ej_2a(int *lattice, int n, float p,float T_max, float T_min, int T_pasos,flo
       fprintf(fp,"Temperatura %f \n", Ti );
       printf("Temperatura %f\n", Ti);
       float* m_e= malloc (k*sizeof(float));
+      for (int l=0;l<k;l++){
+        m_e[l]=0;
+      }
       for (int i=0;i<niter;i++){
         int M = fill_lattice(lattice,n,p);
         float E = energia_0(lattice,n,J,B);
