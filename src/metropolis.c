@@ -27,7 +27,6 @@ int pick_site(int *lattice, int n) {  // (float) (rand ()   /RAND_MAX) n*n
   return (res%(n*n));
 }
 
-
 int suma_vecinos(int* lattice, int n,int idx){  // Sumo los spins de los vecinos
   int i = idx/n;    // Fila
   int j = idx%n;    // Columna
