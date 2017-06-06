@@ -35,11 +35,12 @@ int main(int argc, char **argv) {
 
   //printf("%p\n", (void *) lattice);
   //magnet(lattice, n, prob, 3, 1.5, 251  , 1 , J, 1000,20000);
-  ej_2b(lattice, n, 0.1, 0.6, 26, 3*n*n, 100, n*n);
-  //int secs = time(NULL);
-  //int paso = calc_paso(lattice, n, B, J, LUT, &E, &M, 10*n, 10*n);
-  //secs = time(NULL)-secs;
-  //  printf("Biseccion: %d en %d min, %d segs\n", paso, secs/60, secs%60);
+  ej_2b(lattice, n, 0.44, 0.6, 9, 2000*n*n, 100, n*n);
+  /*int secs = time(NULL);
+  int rango=300*n*n;
+  int paso=calc_paso(lattice,n,0,0.44,LUT,&E,&M,&rango,100,n*n);
+  secs = time(NULL)-secs;
+  printf("(%d,%d) en %d min, %d segs\n", paso,rango, secs/60, secs%60);*/
   free(LUT);
   free (lattice);
   return 0;

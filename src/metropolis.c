@@ -10,6 +10,12 @@ int metropolis(int *lattice, int n, float B, float J, float* LUT, float *p_e, in
   return res;
 }
 
+int metropolis_segundos_vecinos(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m){
+  int idx = pick_site(lattice, n);
+  int res = flip_segundos_vecinos(lattice, n, B, J, LUT, idx, p_e, p_m);
+  return res;
+}
+
 int pick_site(int *lattice, int n) {  // (float) (rand ()   /RAND_MAX) n*n
   int dim = n*n;
   int r = rand();
@@ -33,6 +39,19 @@ int suma_vecinos(int* lattice, int n,int idx){  // Sumo los spins de los vecinos
   return res;
 }
 
+int suma_segundos_vecinos(int* lattice, int n,int idx){  // Sumo los spins de los vecinos
+  int i = idx/n;    // Fila
+  int j = idx%n;    // Columna
+  int f_sup = (i+n-1)%n;  // Fila del spin superior
+  int f_inf = (i+1)%n;    // Fila del spin inferior
+  int c_der = (j+1)%n;    // Columna del spin derecho
+  int c_izq = (j+n-1)%n;  // Columna del spin izquierdo
+// Con esto veo a que spin me refiero; por ejemplo, superior derecho es f_sup*n+c_der
+// Abajo el orden seria: inferior derecho, superior derecho, inferior derecho e inferior izquierdo
+  int res=lattice[f_inf*n+c_der]+lattice[f_sup*n+c_der]+lattice[f_inf*n+c_der]+lattice[f_inf*n+c_izq];
+  return res;
+}
+
 int flip(int *lattice, int n, float B, float J, float* LUT, int idx, float *p_e, int* p_m){
   int res=0;
   int s = suma_vecinos(lattice,n,idx);
@@ -44,6 +63,24 @@ int flip(int *lattice, int n, float B, float J, float* LUT, int idx, float *p_e,
     res=1;
     lattice[idx]=-lattice[idx];
     *p_e=(*p_e)-2*(J*s+B)*lattice[idx];
+    *p_m=(*p_m)+2*lattice[idx];
+  }
+  return res;
+}
+
+int flip_segundos_vecinos(int *lattice, int n, float B, float J, float* LUT,float* LUT2, int idx, float *p_e, int* p_m){
+  int res=0;
+  int s1 = suma_vecinos(lattice,n,idx);
+  int s2 = suma_segundos_vecinos(lattice,n,idx);
+  float proba = LUT[s1/2+2+5*(1-lattice[idx])/2]*LUT2[s2/2+2+5*(1-lattice[idx])/2];
+  // Si el spin es negativo, lo busca en los ultimos 5. Si es positivo, lo busca en los primeros 5 (no suma 5)
+// Dentro del subarray, accede a la posicion i=S/2+2 que corresponde a vecinos sumando 2*i-4
+// Es más fácil entender esto viendo la definición de la LUT en ising.c
+// El producto de las LUT es equivalente a sumar los exponentes de las exponenciales (la LUT2 debe tomar -J y B=0)
+  if(((float)rand())/RAND_MAX<proba){
+    res=1;
+    lattice[idx]=-lattice[idx];
+    *p_e=(*p_e)-2*(J*s1-J*s2+B)*lattice[idx];
     *p_m=(*p_m)+2*lattice[idx];
   }
   return res;
