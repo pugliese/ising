@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
   M=fill_lattice(lattice, n, prob);
   E=energia_0(lattice,n,J,B);
 
-//  ej_2a(lattice, n,  prob,3,  1,  30, 1,  0, 1000,10000 );
+  ej_2a(lattice, n,  prob,3,  0.3, 4, 1,  0, 1000,10000 );
 //  ej_2c(lattice,n,prob,1,0.1,0.6,100,0,10000,2200);
 
   //printf("%p\n", (void *) lattice);
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
     ej_2b(lattice2, n, J_min, J_max, m, k, niter, nsaltos);
     free(lattice2);
   }
-  
+
   if(Programa == 44){
     float J_max, J_min, T;
     int m,k,*lattice2;
