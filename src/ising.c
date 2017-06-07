@@ -30,20 +30,26 @@ int main(int argc, char **argv) {
   M=fill_lattice(lattice, n, prob);
   E=energia_0(lattice,n,J,B);
 
-  ej_2a(lattice, n,  prob,3,  0.3, 4, 1,  0, 1000,10000 );
+  //ej_2a(lattice, n,  prob,3,  0.3, 4, 1,  0, 1000,10000 );
 //  ej_2c(lattice,n,prob,1,0.1,0.6,100,0,10000,2200);
 
   //printf("%p\n", (void *) lattice);
   //magnet(lattice, n, prob, 3, 1.5, 251  , 1 , J, 1000,20000);
 
-  ej_2b(lattice, n, 0.5, 0.6, 6, 8*n*n, 500, n*n);
-  //int secs = time(NULL);
-  //int paso = calc_paso(lattice, n, B, J, LUT, &E, &M, 10*n, 10*n);
-  //secs = time(NULL)-secs;
-  //  printf("Biseccion: %d en %d min, %d segs\n", paso, secs/60, secs%60);
+  ej_2b(lattice, n, 0.48, 0.2, 2, 100*n*n, 500, n*n);
+  /*int secs = time(NULL);
+  int k = 100*n*n;
+  int paso = calc_paso(lattice, n, 0, 0.48, LUT, &E, &M, &k, 100, n*n);
+  secs = time(NULL)-secs;
+  printf("%d en %d min, %d segs\n", paso, secs/60, secs%60);*/
+
 
   int Programa;
-  sscanf(argv[1], "%x", &Programa);
+  if(argc>1){
+    sscanf(argv[1], "%x", &Programa);
+  }else{
+    Programa =0;
+  }
 
 
   if(Programa == 42){
@@ -64,7 +70,7 @@ int main(int argc, char **argv) {
 
   if(Programa == 43){
     float J_max, J_min;
-    int m,k,*lattice2;
+    int m,k,*lattice2, nsaltos;
     sscanf(argv[2], "%d", &n);
     sscanf(argv[3], "%f", &J_min);
     sscanf(argv[4], "%f", &J_max);
@@ -93,6 +99,37 @@ int main(int argc, char **argv) {
     free(lattice2);
   }
 
+  if(Programa == 45){
+    float J_max, J_min, T;
+    int m,k,*lattice2;
+    sscanf(argv[2], "%d", &n);
+    sscanf(argv[3], "%f", &T);
+    sscanf(argv[4], "%f", &J_min);
+    sscanf(argv[5], "%f", &J_max);
+    sscanf(argv[6], "%d", &m);
+    sscanf(argv[7], "%f", &B);
+    sscanf(argv[8], "%d", &niter);
+    sscanf(argv[9], "%d", &k);
+    lattice2 = (int *) malloc(n*n*sizeof(int));
+    ej_2d(lattice, n, 0.5,T, J_min,J_max, m, B,niter,k);
+    free(lattice2);
+  }
+
+  if(Programa == 46){
+    float J_max, J_min, T;
+    int m,k,*lattice2;
+    sscanf(argv[2], "%d", &n);
+    sscanf(argv[3], "%f", &T);
+    sscanf(argv[4], "%f", &J_min);
+    sscanf(argv[5], "%f", &J_max);
+    sscanf(argv[6], "%d", &m);
+    sscanf(argv[7], "%f", &B);
+    sscanf(argv[8], "%d", &niter);
+    sscanf(argv[9], "%d", &k);
+    lattice2 = (int *) malloc(n*n*sizeof(int));
+    ej_2e(lattice, n, 0.5,T, J_min,J_max, m, B,niter,k);
+    free(lattice2);
+  }
 
   free(LUT);
   free (lattice);

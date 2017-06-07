@@ -195,11 +195,11 @@ int ej_2e(int *lattice, int n, float p,float T,float Jmin,float Jmax,int Paso , 
     LUT = LookUpTable(J,B,T);
     LUT2 = LookUpTable(-J,0,T);
     for (int i=0;i<5000;i++){                    // Termalizacion
-      metropolis_segundos_vecinos(lattice, n,B,J,LUT,&E,&M);
+      metropolis_segundos_vecinos(lattice, n,B,J,LUT,LUT2,&E,&M);
     }
     for (int j = 0; j < niter; j++){
       for(int l=0;l<k;l++){
-        metropolis_segundos_vecinos(lattice, n,B,J,LUT,&E,&M);
+        metropolis_segundos_vecinos(lattice, n,B,J,LUT,LUT2,&E,&M);
       }
       m_J = m_J+((float)M)/niter;
       e_J = e_J+((float)E)/niter;
