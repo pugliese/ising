@@ -36,12 +36,13 @@ int main(int argc, char **argv) {
   //printf("%p\n", (void *) lattice);
   //magnet(lattice, n, prob, 3, 1.5, 251  , 1 , J, 1000,20000);
 
-  ej_2b(lattice, n, 0.48, 0.2, 2, 100*n*n, 500, n*n);
+  //ej_2b(lattice, n, 0.48, 0.5, 2, 100*n*n, 500, n*n);
   /*int secs = time(NULL);
   int k = 100*n*n;
   int paso = calc_paso(lattice, n, 0, 0.48, LUT, &E, &M, &k, 100, n*n);
   secs = time(NULL)-secs;
   printf("%d en %d min, %d segs\n", paso, secs/60, secs%60);*/
+  // ej_2d(lattice, n, 0.5,1, -0.6,-0.1, 26, 1, 10000,10*n*n);
 
 
   int Programa;
@@ -99,35 +100,46 @@ int main(int argc, char **argv) {
     free(lattice2);
   }
 
+    /* ---> ACLARACION: 2d) y 2e) <--- */
+// La variable var=1,2,3 indica cual es la variable que será iterada
+// El orden numerico de las variables es JBT osea que 1->J, 2->B y 3->T
+// Los valores X1 y X2 van, en orden, a las 2 variables restantes
+
+// Lo ideal es fijar X1 o X2 en 1 para trabajar con solo 2 variables reducidas
+// Las variables reducidas son J/T, B/T y J/B, pero no sirven de mucho (por ahora)
+// Recomiendo fijar B (y solo B) y graficar en funcion de J o T
+// Por ejemplo, se puede graficar en funcion de T para distintos valores de J/B
   if(Programa == 45){
-    float J_max, J_min, T;
-    int m,k,*lattice2;
+    float X_max, X_min, X1, X2;
+    int var,m,k,*lattice2;
     sscanf(argv[2], "%d", &n);
-    sscanf(argv[3], "%f", &T);
-    sscanf(argv[4], "%f", &J_min);
-    sscanf(argv[5], "%f", &J_max);
+    sscanf(argv[3], "%d", &var);
+    sscanf(argv[4], "%f", &X_min);
+    sscanf(argv[5], "%f", &X_max);
     sscanf(argv[6], "%d", &m);
-    sscanf(argv[7], "%f", &B);
-    sscanf(argv[8], "%d", &niter);
-    sscanf(argv[9], "%d", &k);
+    sscanf(argv[7], "%f", &X1);
+    sscanf(argv[8], "%f", &X2);
+    sscanf(argv[9], "%d", &niter);
+    sscanf(argv[10], "%d", &k);
     lattice2 = (int *) malloc(n*n*sizeof(int));
-    ej_2d(lattice, n, 0.5,T, J_min,J_max, m, B,niter,k);
+    ej_2d(lattice2,n,var,X_min,X_max,m,X1,X2,niter,k);
     free(lattice2);
   }
 
   if(Programa == 46){
-    float J_max, J_min, T;
-    int m,k,*lattice2;
+    float X_max, X_min, X1, X2;
+    int var,m,k,*lattice2;
     sscanf(argv[2], "%d", &n);
-    sscanf(argv[3], "%f", &T);
-    sscanf(argv[4], "%f", &J_min);
-    sscanf(argv[5], "%f", &J_max);
+    sscanf(argv[3], "%d", &var);
+    sscanf(argv[4], "%f", &X_min);
+    sscanf(argv[5], "%f", &X_max);
     sscanf(argv[6], "%d", &m);
-    sscanf(argv[7], "%f", &B);
-    sscanf(argv[8], "%d", &niter);
-    sscanf(argv[9], "%d", &k);
+    sscanf(argv[7], "%f", &X1);
+    sscanf(argv[8], "%f", &X2);
+    sscanf(argv[9], "%d", &niter);
+    sscanf(argv[10], "%d", &k);
     lattice2 = (int *) malloc(n*n*sizeof(int));
-    ej_2e(lattice, n, 0.5,T, J_min,J_max, m, B,niter,k);
+    ej_2e(lattice2,n,var,X_min,X_max,m,X1,X2,niter,k);
     free(lattice2);
   }
 

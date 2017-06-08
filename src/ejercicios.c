@@ -93,17 +93,18 @@ int ej_2b(int *lattice, int n, float J_min, float J_max, int m, int k, int niter
 }
 int ej_2c(int *lattice, int n, float p,float T, float J_min,float J_max, int Paso,float B,int niter,int k){
   float J=J_min;
-  int M = fill_lattice(lattice,n,p);
-  float E = energia_0(lattice,n,J,B);
+  int M;
   printf("Ejercicio 2c)\n");
-  float* LUT;
+  float* LUT, E;
   FILE *fp = fopen("Ejercicio 2_c.txt","a");
   float step = (J_max-J_min)/(Paso-1);
-  fprintf(fp, "Magnetizacion para J entre %g y %g con %d pasos con T=%f \n ", J_max,J_min, Paso,T);
+  fprintf(fp, "Simulacion para B/T= %f tomando J/T entre %f y %f, haciendo %d pasos \nMagnetizacion:\n", B,J_min,J_max,Paso);
   int secs = time(NULL);
   float *ener_t= malloc (Paso*sizeof(float));
   for(int m=0;m<Paso;m++){
     J=J_min+m*step;
+    M = fill_lattice(lattice,n,p);
+    E = energia_0(lattice,n,J,B);
     float m_J=0;
     float e_J=0;
     LUT = LookUpTable(J,B,T);
@@ -122,10 +123,9 @@ int ej_2c(int *lattice, int n, float p,float T, float J_min,float J_max, int Pas
   printf("%g finalizado\n", J);
   free(LUT);
   }
-  fprintf(fp, "\n Energia para J entre %g y %g con %d pasos con T=%f \n ", J_max,J_min, Paso,T);
+  fprintf(fp, "\nEnergia:\n ");
   for(int i=0;i<Paso;i++){
     fprintf(fp, "%g ,", ener_t[i]);
-    printf("%d finalizado\n", i);
   }
   free(ener_t);
   secs = time(NULL)-secs;
@@ -133,19 +133,46 @@ int ej_2c(int *lattice, int n, float p,float T, float J_min,float J_max, int Pas
   fclose(fp);
   return 0;
 }
-int ej_2d(int *lattice, int n, float p,float T,float Jmin,float Jmax,int Paso , float B,int niter,int k){
-  int M = fill_lattice(lattice,n,p);
-  float E = energia_0(lattice,n,Jmin,B);
-  float* LUT;
-  float J;
-  printf("Ejercicio 2d)\n");
+int ej_2d(int *lattice, int n, int var,float Xmin,float Xmax,int Paso, float X1, float X2,int niter,int k){
+// La variable var=1,2,3 indica cual es la variable que será iterada
+// El orden numerico de las variables es JBT osea que 1->J, 2->B y 3->T
+// Los valores X1 y X2 van, en orden, a las 2 variables restantes
+  int M;
+  float *LUT, E;
+  float J, B, T;
+  float Jstep=0, Bstep=0, Tstep=0;
   FILE *fp = fopen("Ejercicio 2_d.txt","a");
-  fprintf(fp, "Magnetizacion para Temperatura %f , B= %f con J maximo =%f , Jminimo= %f, haciendo %d pasos \n ", T,B,Jmax,Jmin,Paso);
-  float step = (Jmax-Jmin)/(Paso-1);
+  if (var==1){  // Proceso de seleccion de variable; cambia el "header" del txt generado
+    J = Xmin;
+    Jstep = (Xmax-Xmin)/(Paso-1);
+    B = X1;
+    T = X2;
+    fprintf(fp, "Simulacion para B=%f y T=%f variando J entre %f y %f, haciendo %d pasos\nSe promediaron %d valores para cada magnitud, espaciados %d pasos\nMagnetizacion:\n",X1,X2,Xmin,Xmax,Paso,niter,k);
+  }else{
+    if (var==2){
+      B = Xmin;
+      Bstep = (Xmax-Xmin)/(Paso-1);
+      J = X1;
+      T = X2;
+      fprintf(fp, "Simulacion para J=%f y T=%f variando B entre %f y %f, haciendo %d pasos\nSe promediaron %d valores para cada magnitud, espaciados %d pasos\nMagnetizacion:\n",X1,X2,Xmin,Xmax,Paso,niter,k);
+    }
+    if (var==3){
+      T = Xmin;
+      Tstep = (Xmax-Xmin)/(Paso-1);
+      J = X1;
+      B = X2;
+      fprintf(fp, "Simulacion para J=%f y B=%f variando T entre %f y %f, haciendo %d pasos\nSe promediaron %d valores para cada magnitud, espaciados %d pasos\nMagnetizacion:\n",X1,X2,Xmin,Xmax,Paso,niter,k);
+    }
+  }
+  printf("Ejercicio 2d)\n");
   int secs = time (NULL);
   float *ener_t= malloc (Paso*sizeof(float));
   for(int m=0;m<Paso;m++){
-    J=Jmin+m*step;
+    J = J+Jstep;  // Dependiendo de var, dos de estas variables tienen
+    B = B+Bstep;  // su step igual a cero. Por lo tanto, son constantes
+    T = T+Tstep;
+    M = fill_lattice(lattice,n,0.5);
+    E = energia_0(lattice,n,J,B);
     float m_J=0;
     float e_J=0;
     LUT = LookUpTable(J,B,T);
@@ -161,13 +188,12 @@ int ej_2d(int *lattice, int n, float p,float T,float Jmin,float Jmax,int Paso , 
     }
     ener_t[m]=e_J;
     fprintf(fp, "%g ,", m_J);
-    printf("%g finalizado\n", J);
+    printf("%d finalizado\n", m+1);
     free(LUT);
   }
-  fprintf(fp, "\n Energia para Temperatura %f , con J iniciando en %f  y haciendo %d pasos \n ", T,Jmin,Paso);
+  fprintf(fp, "\nEnergia:\n");
   for(int i=0;i<Paso;i++){
     fprintf(fp, "%g ,", ener_t[i]);
-    printf("%d finalizado\n", i);
   }
   free(ener_t);
   secs = time(NULL)-secs;
@@ -177,19 +203,46 @@ int ej_2d(int *lattice, int n, float p,float T,float Jmin,float Jmax,int Paso , 
 }
 
 
-int ej_2e(int *lattice, int n, float p,float T,float Jmin,float Jmax,int Paso , float B,int niter,int k){
-  int M = fill_lattice(lattice,n,p);
-  float E = energia_0_segundos_vecinos(lattice,n,Jmin,B);
-  float* LUT, *LUT2;
-  float J;
+int ej_2e(int *lattice, int n, int var,float Xmin,float Xmax,int Paso, float X1, float X2,int niter,int k){
+// La variable var=1,2,3 indica cual es la variable que será iterada
+// El orden numerico de las variables es JBT osea que 1->J, 2->B y 3->T
+// Los valores X1 y X2 van, en orden, a las 2 variables restantes
+  int M;
+  float *LUT, *LUT2, E;
+  float J, B, T;
+  float Jstep=0, Bstep=0, Tstep=0;
+  FILE *fp = fopen("Ejercicio 2_d.txt","a");
+  if (var==1){  // Proceso de seleccion de variable; cambia el "header" del txt generado
+    J = Xmin;
+    Jstep = (Xmax-Xmin)/(Paso-1);
+    B = X1;
+    T = X2;
+    fprintf(fp, "Simulacion para B=%f y T=%f variando J entre %f y %f, haciendo %d pasos\nSe promediaron %d valores para cada magnitud, espaciados %d pasos\nMagnetizacion:\n",X1,X2,Xmin,Xmax,Paso,niter,k);
+  }else{
+    if (var==2){
+      B = Xmin;
+      Bstep = (Xmax-Xmin)/(Paso-1);
+      J = X1;
+      T = X2;
+      fprintf(fp, "Simulacion para J=%f y T=%f variando B entre %f y %f, haciendo %d pasos\nSe promediaron %d valores para cada magnitud, espaciados %d pasos\nMagnetizacion:\n",X1,X2,Xmin,Xmax,Paso,niter,k);
+    }
+    if (var==3){
+      T = Xmin;
+      Tstep = (Xmax-Xmin)/(Paso-1);
+      J = X1;
+      B = X2;
+      fprintf(fp, "Simulacion para J=%f y B=%f variando T entre %f y %f, haciendo %d pasos\nSe promediaron %d valores para cada magnitud, espaciados %d pasos\nMagnetizacion:\n",X1,X2,Xmin,Xmax,Paso,niter,k);
+    }
+  }
   printf("Ejercicio 2e)\n");
-  FILE *fp = fopen("Ejercicio 2_e.txt","a");
-  fprintf(fp, "Magnetizacion para Temperatura %f , B= %f con J maximo =%f , Jminimo= %f, haciendo %d pasos \n ", T,B,Jmax,Jmin,Paso);
-  float step = (Jmax-Jmin)/(Paso-1);
   int secs = time (NULL);
   float *ener_t= malloc (Paso*sizeof(float));
   for(int m=0;m<Paso;m++){
-    J=Jmin+m*step;
+    J = J+Jstep;  // Dependiendo de var, dos de estas variables tienen
+    B = B+Bstep;  // su step igual a cero. Por lo tanto, son constantes
+    T = T+Tstep;
+    M = fill_lattice(lattice,n,0.5);
+    E = energia_0_segundos_vecinos(lattice,n,J,B);
     float m_J=0;
     float e_J=0;
     LUT = LookUpTable(J,B,T);
@@ -206,14 +259,13 @@ int ej_2e(int *lattice, int n, float p,float T,float Jmin,float Jmax,int Paso , 
     }
     ener_t[m]=e_J;
     fprintf(fp, "%g ,", m_J);
-    printf("%g finalizado\n", J);
+    printf("%d finalizado\n", m+1);
     free(LUT);
     free(LUT2);
   }
-  fprintf(fp, "\n Energia para Temperatura %f , con J iniciando en %f  y haciendo %d pasos \n ", T,Jmin,Paso);
+  fprintf(fp, "\nEnergia:\n");
   for(int i=0;i<Paso;i++){
     fprintf(fp, "%g ,", ener_t[i]);
-    printf("%d finalizado\n", i);
   }
   free(ener_t);
   secs = time(NULL)-secs;
