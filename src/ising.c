@@ -18,8 +18,8 @@ int main(int argc, char **argv) {
   int n = 32;
   int *lattice = malloc(n * n * sizeof(int));
   float prob = 0.5;
-  float T =1;
-  float J=0.2;
+  float T =2.2;
+  float J=1;
   float E;
   int M;
   int niter = 2000;
@@ -29,6 +29,8 @@ int main(int argc, char **argv) {
   float* LUT =LookUpTable(J,B,T);
   M=fill_lattice(lattice, n, prob);
   E=energia_0(lattice,n,J,B);
+  graf_bimodal(lattice,n,B,J/T,LUT,&E,&M,10000);
+
 
   //ej_2a(lattice, n,  prob,3,  0.3, 4, 1,  0, 1000,10000 );
 //  ej_2c(lattice,n,prob,1,0.1,0.6,100,0,10000,2200);

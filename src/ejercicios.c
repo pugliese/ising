@@ -211,7 +211,7 @@ int ej_2e(int *lattice, int n, int var,float Xmin,float Xmax,int Paso, float X1,
   float *LUT, *LUT2, E;
   float J, B, T;
   float Jstep=0, Bstep=0, Tstep=0;
-  FILE *fp = fopen("Ejercicio 2_d.txt","a");
+  FILE *fp = fopen("Ejercicio 2_e.txt","a");
   if (var==1){  // Proceso de seleccion de variable; cambia el "header" del txt generado
     J = Xmin;
     Jstep = (Xmax-Xmin)/(Paso-1);
@@ -270,6 +270,24 @@ int ej_2e(int *lattice, int n, int var,float Xmin,float Xmax,int Paso, float X1,
   free(ener_t);
   secs = time(NULL)-secs;
   fprintf(fp, "\nEl calculo tomo %d hs, %d min, %d secs\n\n", secs/3600, (secs/60) % 60, secs % 60);
+  fclose(fp);
+  return 0;
+}
+
+
+int graf_bimodal(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int niter){
+  FILE* fp = fopen("bimodal.txt", "a");
+  fprintf(fp, "Distribucion de la magnetizacion para J/T=%f (B=0)\n", J);
+  for(int j=0;j<10000;j++){ // Termalizo
+    metropolis(lattice,n,B,J,LUT,p_e,p_m);
+  }
+  for(int i=0;i<niter;i++){
+    for(int j=0;j<10000;j++){
+      metropolis(lattice,n,B,J,LUT,p_e,p_m);
+    }
+    fprintf(fp, "%d, ", *p_m);
+  }
+  fprintf(fp, "\n");
   fclose(fp);
   return 0;
 }

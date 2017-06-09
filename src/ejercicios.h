@@ -5,4 +5,5 @@ int ej_2a(int *lattice, int n, float p,float T_max, float T_min, int T_pasos,flo
 int ej_2c(int *lattice, int n, float p,float T, float J_min,float J_max, int Paso,float B,int niter,int k);
 int ej_2d(int *lattice, int n, int var,float Xmin,float Xmax,int Paso, float X1, float X2,int niter,int k);
 int ej_2e(int *lattice, int n, int var,float Xmin,float Xmax,int Paso, float X1, float X2,int niter,int k);
+int graf_bimodal(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int niter);
 #endif

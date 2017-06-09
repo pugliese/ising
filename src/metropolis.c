@@ -109,6 +109,7 @@ float* LookUpTable(float J, float B, float T){
   }
   return res;
 }
+
 /*
 float* correlacion(int *lattice, int n, float B, float J, float* LUT, float *p_e, int* p_m, int k, int niter, int nsaltos){
   int i,j,m,ceros=0;
