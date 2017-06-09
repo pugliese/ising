@@ -91,22 +91,22 @@ int ej_2b(int *lattice, int n, float J_min, float J_max, int m, int k, int niter
   //free(paso);
   return 0;
 }
-int ej_2c(int *lattice, int n, float p,float T, float J_min,float J_max, int Paso,float B,int niter,int k){
-  float J=J_min;
+int ej_2c(int *lattice, int n, float p,float T_min, float T_max, int Paso,float J,float B,int niter,int k){
   int M;
+  float T=T_min;
   printf("Ejercicio 2c)\n");
   float* LUT, E;
   FILE *fp = fopen("Ejercicio 2_c.txt","a");
-  float step = (J_max-J_min)/(Paso-1);
-  fprintf(fp, "Simulacion para B/T= %f tomando J/T entre %f y %f, haciendo %d pasos \nMagnetizacion:\n", B,J_min,J_max,Paso);
+  float step = (T_max-T_min)/(Paso-1);
+  fprintf(fp, "Simulacion para J= %f,B=%f tomando T entre %f y %f, haciendo %d pasos \nMagnetizacion:\n", J,B,T_min,T_max,Paso);
   int secs = time(NULL);
   float *ener_t= malloc (Paso*sizeof(float));
   for(int m=0;m<Paso;m++){
-    J=J_min+m*step;
+    T=T_min+m*step;
     M = fill_lattice(lattice,n,p);
     E = energia_0(lattice,n,J,B);
-    float m_J=0;
-    float e_J=0;
+    float m_T=0;
+    float e_T=0;
     LUT = LookUpTable(J,B,T);
     for (int i=0;i<5000;i++){       //Termalizacion
       metropolis(lattice, n,B,J,LUT,&E,&M);
@@ -115,12 +115,12 @@ int ej_2c(int *lattice, int n, float p,float T, float J_min,float J_max, int Pas
       for(int l=0;l<k;l++){
         metropolis(lattice, n,B,J,LUT,&E,&M);
       }
-      m_J = m_J+((float)M)/niter;
-      e_J = e_J+((float)E)/niter;
+      m_T = m_T+((float)M)/niter;
+      e_T = e_T+((float)E)/niter;
     }
-  ener_t[m]=e_J;
-  fprintf(fp, "%g ,", m_J);
-  printf("%g finalizado\n", J);
+  ener_t[m]=e_T;
+  fprintf(fp, "%g ,", m_T);
+  printf("%g finalizado\n", T);
   free(LUT);
   }
   fprintf(fp, "\nEnergia:\n ");
