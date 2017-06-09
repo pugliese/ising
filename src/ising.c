@@ -87,24 +87,23 @@ int main(int argc, char **argv) {
   }
 
   if(Programa == 44){
-    float J_max, J_min, T;
+    float T_max, T_min;
     int m,k,*lattice2;
     sscanf(argv[2], "%d", &n);
-    sscanf(argv[3], "%f", &T);
-    sscanf(argv[4], "%f", &J_min);
-    sscanf(argv[5], "%f", &J_max);
-    sscanf(argv[6], "%d", &m);
+    sscanf(argv[3], "%f", &T_min);
+    sscanf(argv[4], "%f", &T_max);
+    sscanf(argv[5], "%d", &m);
+    sscanf(argv[6], "%f", &J);
     sscanf(argv[7], "%f", &B);
     sscanf(argv[8], "%d", &niter);
     sscanf(argv[9], "%d", &k);
     lattice2 = (int *) malloc(n*n*sizeof(int));
-    ej_2c(lattice, n, 0.5,T, J_min,J_max, m, B,niter,k);
+    ej_2c(lattice2, n, 0.5,T_min, T_max, m, J,B,niter,k);
     free(lattice2);
   }
-
-    /* ---> ACLARACION: 2d) y 2e) <--- */
+  /* ---> ACLARACION: 2d) y 2e) <--- */
 // La variable var=1,2,3 indica cual es la variable que será iterada
-// El orden numerico de las variables es JBT osea que 1->J, 2->B y 3->T
+// El orden numerico de  las variables es JBT osea que 1->J, 2->B y 3->T
 // Los valores X1 y X2 van, en orden, a las 2 variables restantes
 
 // Lo ideal es fijar X1 o X2 en 1 para trabajar con solo 2 variables reducidas
